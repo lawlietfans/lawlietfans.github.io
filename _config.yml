@@ -2,11 +2,11 @@
 #      Main Configs       #
 # ----------------------- #
 
-url: http://lawlietfans.github.io
+url: http://lawlietfans.coding.me
 title: SHENJIEFENG's BLOG
 subtitle: Linux;C/C++
 author: SHENJIEFENG
-simple_search: https://www.google.com/search
+simple_search: https://www.baidu.com/search
 description:
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
@@ -64,7 +64,7 @@ default_asides: [asides/recent_posts.html, asides/github.html, asides/delicious.
 # ----------------------- #
 
 # Github repositories
-github_user:
+github_user: lawlietfans
 github_repo_count: 0
 github_show_profile_link: true
 github_skip_forks: true
