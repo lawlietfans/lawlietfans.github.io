@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[SHENJIEFENG's BLOG]]></title>
-  <link href="http://lawlietfans.github.io/atom.xml" rel="self"/>
-  <link href="http://lawlietfans.github.io/"/>
-  <updated>2016-03-12T18:32:33+08:00</updated>
-  <id>http://lawlietfans.github.io/</id>
+  <link href="http://lawlietfans.coding.me/atom.xml" rel="self"/>
+  <link href="http://lawlietfans.coding.me/"/>
+  <updated>2016-03-12T22:03:57+08:00</updated>
+  <id>http://lawlietfans.coding.me/</id>
   <author>
     <name><![CDATA[SHENJIEFENG]]></name>
     
@@ -14,18 +14,13 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Using Hexo With Jekyll]]></title>
-    <link href="http://lawlietfans.github.io/blog/2015/11/08/using-hexo-with-jekyll/"/>
-    <updated>2015-11-08T00:00:00+08:00</updated>
-    <id>http://lawlietfans.github.io/blog/2015/11/08/using-hexo-with-jekyll</id>
-    <content type="html"><![CDATA[<p>title: 基于github pages与hexo搭建一个独立博客
-date: 2015-11-08 17:08:22</p>
-
-<h2>tags: 博客搭建与配置</h2>
-
-<p>原文地址：<a href="http://lawlietfans.github.io/2015/11/08/using-hexo-with-jekyll/">http://lawlietfans.github.io/2015/11/08/using-hexo-with-jekyll/</a>
+    <title type="html"><![CDATA[基于github Pages与hexo搭建一个独立博客]]></title>
+    <link href="http://lawlietfans.coding.me/blog/2015/11/09/using-hexo-with-jekyll/"/>
+    <updated>2015-11-09T01:08:22+08:00</updated>
+    <id>http://lawlietfans.coding.me/blog/2015/11/09/using-hexo-with-jekyll</id>
+    <content type="html"><![CDATA[<blockquote><p>原文地址：<a href="http://lawlietfans.github.io/2015/11/08/using-hexo-with-jekyll/">http://lawlietfans.github.io/2015/11/08/using-hexo-with-jekyll/</a><br/>
 2015-11-15 theme update<br/>
-原文备份到：<a href="http://lawlietfans.github.io/project-site-blogs/2015/11/08/using-hexo-with-jekyll/">http://lawlietfans.github.io/project-site-blogs/2015/11/08/using-hexo-with-jekyll/</a></p>
+原文备份到：<a href="http://lawlietfans.github.io/project-site-blogs/2015/11/08/using-hexo-with-jekyll/">http://lawlietfans.github.io/project-site-blogs/2015/11/08/using-hexo-with-jekyll/</a></p></blockquote>
 
 <p>介绍基于github pages搭建独立博客的博文已经有很多了，而本文旨在帮助读者了解基于github pages与hexo搭建一个独立博客的整体过程，顺便备忘。</p>
 
