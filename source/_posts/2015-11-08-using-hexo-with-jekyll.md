@@ -1,10 +1,16 @@
+---
+layout: post
 title: 基于github pages与hexo搭建一个独立博客
 date: 2015-11-08 17:08:22
+comments: true
+external-url:
+categories:
 tags: 博客搭建与配置
 ---
-原文地址：http://lawlietfans.github.io/2015/11/08/using-hexo-with-jekyll/
-2015-11-15 theme update  
-原文备份到：http://lawlietfans.github.io/project-site-blogs/2015/11/08/using-hexo-with-jekyll/
+
+>原文地址：http://lawlietfans.github.io/2015/11/08/using-hexo-with-jekyll/  
+>2015-11-15 theme update  
+>原文备份到：http://lawlietfans.github.io/project-site-blogs/2015/11/08/using-hexo-with-jekyll/
 
 
 介绍基于github pages搭建独立博客的博文已经有很多了，而本文旨在帮助读者了解基于github pages与hexo搭建一个独立博客的整体过程，顺便备忘。
