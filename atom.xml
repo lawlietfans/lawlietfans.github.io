@@ -4,7 +4,7 @@
   <title><![CDATA[SHENJIEFENG's BLOG]]></title>
   <link href="http://lawlietfans.coding.me/atom.xml" rel="self"/>
   <link href="http://lawlietfans.coding.me/"/>
-  <updated>2016-03-18T22:37:08+08:00</updated>
+  <updated>2016-03-18T22:55:16+08:00</updated>
   <id>http://lawlietfans.coding.me/</id>
   <author>
     <name><![CDATA[SHENJIEFENG]]></name>
@@ -18,7 +18,7 @@
     <link href="http://lawlietfans.coding.me/blog/2016/02/29/introduction-and-centos67-install/"/>
     <updated>2016-02-29T20:00:00+08:00</updated>
     <id>http://lawlietfans.coding.me/blog/2016/02/29/introduction-and-centos67-install</id>
-    <content type="html"><![CDATA[<p>原文地址：<a href="http://lawlietfans.coding.me/blog/2016/02/29/introduction-and-centos67-install/">http://lawlietfans.coding.me/blog/2016/02/29/introduction-and-centos67-install/</a></p>
+    <content type="html"><![CDATA[<blockquote><p>原文地址：<a href="http://lawlietfans.coding.me/blog/2016/02/29/introduction-and-centos67-install/">http://lawlietfans.coding.me/blog/2016/02/29/introduction-and-centos67-install/</a></p></blockquote>
 
 <p>相比于在PC端的流行的Windows，多数服务器使用的则是Linux系统。对于刚刚进入IT领域的“菜鸟”而言，学习和掌握Linux服务器配置与管理是非常有意义的。学windows，天天跟着时尚跑，今天DNA，明天COM，后天.NET; 而Unix/Linux，几十年前的思想今天看来依然光彩夺目。（<a href="http://www.zhihu.com/question/19771396">学习 Linux 有哪些好处？</a>)。</p>
 
@@ -141,6 +141,24 @@
 
 
 <p>2~5都是on，就表明会自动启动</p>
+
+<h1>5 通过xshell连接<code>vm-centos</code></h1>
+
+<p>安装好openssh之后就能在宿主机连接<code>vm-centos</code>了。</p>
+
+<p>获取<code>vm-centos</code>地址</p>
+
+<p><img src="http://7xo0zf.com1.z0.glb.clouddn.com/16-3-18/64469253.jpg" alt="" />
+<img src="http://7xo0zf.com1.z0.glb.clouddn.com/16-3-18/84107400.jpg" alt="" /></p>
+
+<p>打开xshell，新建连接</p>
+
+<p><img src="http://7xo0zf.com1.z0.glb.clouddn.com/16-3-18/40913349.jpg" alt="" />
+<img src="http://7xo0zf.com1.z0.glb.clouddn.com/16-3-18/6379138.jpg" alt="" /></p>
+
+<p>连接成功</p>
+
+<p><img src="http://7xo0zf.com1.z0.glb.clouddn.com/16-3-18/93379079.jpg" alt="" /></p>
 
 <h1>ref</h1>
 
