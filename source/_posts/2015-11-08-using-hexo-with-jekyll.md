@@ -4,11 +4,10 @@ title: 基于github pages与hexo搭建一个独立博客
 date: 2015-11-08 17:08:22
 comments: true
 external-url:
-categories:
-tags: 博客搭建与配置
+categories: [hexo, github]
 ---
 
->原文地址：http://lawlietfans.github.io/2015/11/08/using-hexo-with-jekyll/  
+>原文地址：http://lawlietfans.coding.me/blog/2015/11/08/using-hexo-with-jekyll/  
 >2015-11-15 theme update  
 >原文备份到：http://lawlietfans.github.io/project-site-blogs/2015/11/08/using-hexo-with-jekyll/
 
