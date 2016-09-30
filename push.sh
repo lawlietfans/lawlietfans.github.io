@@ -5,7 +5,7 @@ then
     exit 1;
 elif [ "$1" = 'push' ]
 then
-    git push origin --all
+    git push origin myblogcontent
     exit 1;
 elif [ "$1" = '-h' ]
 then
@@ -15,4 +15,4 @@ fi
 
 git add --all
 git commit -m "$1"
-git push origin --all
+git push origin myblogcontent
