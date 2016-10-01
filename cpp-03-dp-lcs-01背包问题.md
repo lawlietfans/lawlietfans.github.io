@@ -1,4 +1,4 @@
-**动态规划及其在LCS问题和01背包问题中的应用**
+﻿**动态规划及其在LCS问题和01背包问题中的应用**
 
 适合动态规划（DP，dynamic programming）方法的最优化问题有两个要素：最优子结构和重叠子问题。
 
@@ -36,7 +36,21 @@
 
 
 ```cpp
-
+class LCS {
+public:
+    int findLCS(string A, int n, string B, int m) {
+        vector<vector<int> > dp(n+1,vector<int>(m+1,0));//n*m       
+        for(int i=1;i<=n;i++)
+        {
+            for(int j=1;j<=m;j++)
+            {
+                if(A[i-1]==B[j-1]) dp[i][j]=dp[i-1][j-1]+1;
+                else dp[i][j]=max(dp[i-1][j],dp[i][j-1]);
+            }
+        }
+        return dp[n][m];
+    }
+};
 ```
 
 # 2 背包问题
