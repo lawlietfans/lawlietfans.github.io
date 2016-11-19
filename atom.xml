@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[SHENJIEFENG's BLOG]]></title>
+  <title><![CDATA[畑鹿驚 - 博客]]></title>
   <link href="http://lawlietfans.coding.me/atom.xml" rel="self"/>
   <link href="http://lawlietfans.coding.me/"/>
-  <updated>2016-11-19T22:36:51+08:00</updated>
+  <updated>2016-11-20T00:19:51+08:00</updated>
   <id>http://lawlietfans.coding.me/</id>
   <author>
-    <name><![CDATA[SHENJIEFENG]]></name>
+    <name><![CDATA[lawlietfans]]></name>
     
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
@@ -18,19 +18,15 @@
     <link href="http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/"/>
     <updated>2016-03-07T20:00:00+08:00</updated>
     <id>http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation</id>
-    <content type="html"><![CDATA[<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">OUTLINE</span>
-</span><span class='line'><span class="o">-</span> <span class="n">Step</span> <span class="n">by</span> <span class="n">step</span>
-</span><span class='line'><span class="o">-</span> <span class="err">如何编辑文件？——</span><span class="n">vim</span><span class="err">编辑器入门</span>
-</span><span class='line'><span class="o">-</span> <span class="err">用户管理</span>
-</span><span class='line'><span class="o">-</span> <span class="err">文件</span><span class="o">/</span><span class="err">目录权限管理</span>
-</span><span class='line'><span class="o">-</span> <span class="n">ref</span>
-</span></code></pre></td></tr></table></div></figure>
+    <content type="html"><![CDATA[<p>OUTLINE</p>
+
+<ul>
+<li>1 Step by step</li>
+<li>2 如何编辑文件？——vim编辑器入门</li>
+<li>3 用户管理</li>
+<li>4 文件/目录权限管理</li>
+<li>5 ref</li>
+</ul>
 
 
 <blockquote><p>原文地址：<a href="http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/">http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/</a></p></blockquote>
@@ -494,6 +490,9 @@
 <p>本系列教程全部都是基于vmware 11.1+ centos 6.7 i386的，宿主机为Windows7 x64操作系统。<br/>
 本文内容包括：发展史；自由软件文化；Linux系统的优势；安装使用。</p>
 
+<!-- more -->
+
+
 <p>CentOS是Community ENTerprise Operating System的简称，是Linux的一个发行版本。发行版其实就是一些整合的安装套件，它是由一些有系统整合能力的工作小组、机构或商业化公司等主动搜集并整合了网络上的部分Linux程序，把系统内核、附带的工具程序以及应用软件包等打包在一起，组成的一个Linux操作系统的集合体。安装者可以一次安装一个包括各种程序在内的完整系统，极大地提高了系统的安装效率。</p>
 
 <p>其中RHEL(Red Hat Enterprise Linux)是很多企业采用的linux发行版本，需要向RedHat付费才可以使用，并能得到付过费用的服务和技术支持和版本升级。CentOS是RHEL的克隆版本，可以像REHL一样的构筑linux系统环境，但不需要向RedHat付任何的费用，同样也得不到任何有偿技术支持和升级服务。</p>
@@ -651,17 +650,17 @@
 
 <p>介绍基于github pages搭建独立博客的博文已经有很多了，而本文旨在帮助读者了解基于github pages与hexo搭建一个独立博客的整体过程，顺便备忘。</p>
 
-<p>在开始动手操作之前，我们应该了解</p>
+<!-- more -->
 
-<h1>1 什么是github page？为什么要用hexo？</h1>
 
-<p><a href="http://www.ruanyifeng.com/blog/2012/08/blogging_with_jekyll.html" title="搭建一个免费的，无限流量的Blog----github Pages和Jekyll入门">github Pages可以被认为是用户编写的、托管在github上的静态网页</a>,GitHub Pages分两种，一种是你的GitHub用户名建立的username.github.io这样的用户&amp;组织页（站），另一种是依附项目的pages。
+<p>在开始动手操作之前，我们应该了解什么是github page？为什么要用hexo？
+<a href="http://www.ruanyifeng.com/blog/2012/08/blogging_with_jekyll.html" title="搭建一个免费的，无限流量的Blog----github Pages和Jekyll入门">github Pages可以被认为是用户编写的、托管在github上的静态网页</a>,GitHub Pages分两种，一种是你的GitHub用户名建立的username.github.io这样的用户&amp;组织页（站），另一种是依附项目的pages。
 即<a href="https://pages.github.com/">organization site和project site</a>.<br/>
 不过官方目前不建议用二级域名，我们这里的例子也是属于organization site.</p>
 
 <p>至于hexo，快速、简洁且高效的博客框架，文档完善，主题丰富</p>
 
-<h1>2 配置organization site</h1>
+<h1>1 配置organization site</h1>
 
 <p> 新增仓库：<a href="https://github.com/new">https://github.com/new</a></p>
 
@@ -688,7 +687,7 @@
 
 <p><a href="http://liuxing.info/2015/06/14/GitHub%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/#%E9%85%8D%E7%BD%AEPages" title="配置pages">参考-详细</a></p>
 
-<h1>3 本地准备工作</h1>
+<h1>2 本地准备工作</h1>
 
 <p><a href="http://git-scm.com/download/">安装git</a><br/>
 安装Node.JS</p>
@@ -720,7 +719,7 @@ $ hexo s
 
 <p><a href="http://wsgzao.github.io/post/hexo-guide/" title="使用GitHub和Hexo搭建免费静态Blog">参考-详细</a></p>
 
-<h1>4 如何使用新主题，以<a href="http://pinggod.com/">Jekyll主题</a>为例</h1>
+<h1>3 如何使用新主题，以<a href="http://pinggod.com/">Jekyll主题</a>为例</h1>
 
 <p><a href="https://hexo.io/themes/" title="more themes">hexo提供的更多主题</a>提供了丰富的主题可以选择，安装方法大同小异，其中包括一款黑色背景的，好了，就它了。</p>
 
@@ -771,9 +770,9 @@ hexo deploy #将.deploy目录部署到GitHub
 hexo clean # 有时候配置没有立即生效需要删除cache
 </code></pre>
 
-<h1>5 修改这个主题</h1>
+<h1>4 修改这个主题</h1>
 
-<h2>5.1 添加新文章</h2>
+<h2>4.1 添加新文章</h2>
 
 <pre><code>$ hexo new [layout] &lt;title&gt;
 </code></pre>
@@ -795,7 +794,7 @@ INFO  Created: e:\workspace\github\blog-github\source\_posts\2015-11-07-test-224
 
 <p>两者都自动生成title和date，但是后者更便于管理。</p>
 
-<h2>5.2 修改主页</h2>
+<h2>4.2 修改主页</h2>
 
 <p>首先对比主页<code>&lt;foldername&gt;/themes/jekyll/layout/index.jade</code>:</p>
 
@@ -858,7 +857,7 @@ block extra
 //- invisible single line comment
 </code></pre>
 
-<h2>5.3 修改头部导航</h2>
+<h2>4.3 修改头部导航</h2>
 
 <p>从这里<code>/layout/_components/nav.jade</code>添加修改menu</p>
 
@@ -880,7 +879,7 @@ block extra
 
 <p>依个人口味酌情修改即可。除此之外，RSS插件<a href="http://wsgzao.github.io/post/hexo-guide/" title="使用GitHub和Hexo搭建免费静态Blog">安装之后</a>本地预览是没效果的，一般部署之后过段时间才有效</p>
 
-<h2>5.4 侧边栏</h2>
+<h2>4.4 侧边栏</h2>
 
 <p><code>layout/_sidebar/</code>包含post.jade、tag.jade、和toc.jade三个部件，理论上都可以添加到archive.jade</p>
 
@@ -904,9 +903,9 @@ out\_sidebar\toc.jade:1
     4|            
 </code></pre>
 
-<p>有待达人解决</p>
+<p>有待牛人解决</p>
 
-<h2>5.5 最后如果使用这个主题有兴趣和问题希望到<a href="https://github.com/pinggod/hexo-theme-jekyll/issues">这里</a>多多交流</h2>
+<h2>4.5 最后如果使用这个主题有兴趣和问题可以到<a href="https://github.com/pinggod/hexo-theme-jekyll/issues">这里</a>多多交流</h2>
 ]]></content>
   </entry>
   

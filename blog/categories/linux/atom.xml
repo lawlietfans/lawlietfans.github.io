@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Linux | SHENJIEFENG's BLOG]]></title>
+  <title><![CDATA[Category: Linux | 畑鹿驚 - 博客]]></title>
   <link href="http://lawlietfans.coding.me/blog/categories/linux/atom.xml" rel="self"/>
   <link href="http://lawlietfans.coding.me/"/>
-  <updated>2016-11-19T22:36:51+08:00</updated>
+  <updated>2016-11-20T00:19:51+08:00</updated>
   <id>http://lawlietfans.coding.me/</id>
   <author>
-    <name><![CDATA[SHENJIEFENG]]></name>
+    <name><![CDATA[lawlietfans]]></name>
     
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
@@ -18,13 +18,16 @@
     <link href="http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/"/>
     <updated>2016-03-07T20:00:00+08:00</updated>
     <id>http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation</id>
-    <content type="html"><![CDATA[<pre><code class="c">OUTLINE
-- Step by step
-- 如何编辑文件？——vim编辑器入门
-- 用户管理
-- 文件/目录权限管理
-- ref
-</code></pre>
+    <content type="html"><![CDATA[<p>OUTLINE</p>
+
+<ul>
+<li>1 Step by step</li>
+<li>2 如何编辑文件？——vim编辑器入门</li>
+<li>3 用户管理</li>
+<li>4 文件/目录权限管理</li>
+<li>5 ref</li>
+</ul>
+
 
 <blockquote><p>原文地址：<a href="http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/">http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/</a></p></blockquote>
 
@@ -370,6 +373,9 @@ total 0
 
 <p>本系列教程全部都是基于vmware 11.1+ centos 6.7 i386的，宿主机为Windows7 x64操作系统。<br/>
 本文内容包括：发展史；自由软件文化；Linux系统的优势；安装使用。</p>
+
+<!-- more -->
+
 
 <p>CentOS是Community ENTerprise Operating System的简称，是Linux的一个发行版本。发行版其实就是一些整合的安装套件，它是由一些有系统整合能力的工作小组、机构或商业化公司等主动搜集并整合了网络上的部分Linux程序，把系统内核、附带的工具程序以及应用软件包等打包在一起，组成的一个Linux操作系统的集合体。安装者可以一次安装一个包括各种程序在内的完整系统，极大地提高了系统的安装效率。</p>
 
