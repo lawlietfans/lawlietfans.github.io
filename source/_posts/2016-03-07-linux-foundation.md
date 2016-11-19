@@ -7,14 +7,15 @@ external-url:
 categories: [Linux]
 ---
 
-```c
 OUTLINE
-- Step by step
-- 如何编辑文件？——vim编辑器入门
-- 用户管理
-- 文件/目录权限管理
-- ref
-```
+
+- 1 Step by step
+- 2 如何编辑文件？——vim编辑器入门
+- 3 用户管理
+- 4 文件/目录权限管理
+- 5 ref
+
+>原文地址：http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/
 
 [上一篇](http://lawlietfans.coding.me/blog/2016/02/29/introduction-and-centos67-install/)提到，Linux发行版就是把系统内核、附带的工具程序以及应用软件包等打包在一起，组成的一个集合体或者套件。而CentOS是其中一种发行版。
 这是Linux操作系统的结构。

@@ -14,15 +14,16 @@ categories: [hexo, github]
 
 介绍基于github pages搭建独立博客的博文已经有很多了，而本文旨在帮助读者了解基于github pages与hexo搭建一个独立博客的整体过程，顺便备忘。
 
-在开始动手操作之前，我们应该了解
-# 1 什么是github page？为什么要用hexo？
+<!-- more -->
+
+在开始动手操作之前，我们应该了解什么是github page？为什么要用hexo？
 [github Pages可以被认为是用户编写的、托管在github上的静态网页][1],GitHub Pages分两种，一种是你的GitHub用户名建立的username.github.io这样的用户&组织页（站），另一种是依附项目的pages。 
 即[organization site和project site][2].  
 不过官方目前不建议用二级域名，我们这里的例子也是属于organization site.
 
 至于hexo，快速、简洁且高效的博客框架，文档完善，主题丰富
 
-# 2 配置organization site
+# 1 配置organization site
  新增仓库：https://github.com/new
 
       Repository name：github账号.github.io
@@ -46,7 +47,7 @@ categories: [hexo, github]
 
 [参考-详细][5]
 
-# 3 本地准备工作
+# 2 本地准备工作
 [安装git][8]  
 安装Node.JS
 
@@ -75,7 +76,7 @@ Git Bush或者Linux环境下terminal会提示输入http://0.0.0.0:4000  查看�
 [参考-详细][6]
 
 
-# 4 如何使用新主题，以[Jekyll主题](http://pinggod.com/)为例
+# 3 如何使用新主题，以[Jekyll主题](http://pinggod.com/)为例
 [hexo提供的更多主题][7]提供了丰富的主题可以选择，安装方法大同小异，其中包括一款黑色背景的，好了，就它了。
 
 安装插件
@@ -120,9 +121,9 @@ clone该主题到`<folder>/themes/jekyll`文件夹
     hexo deploy #将.deploy目录部署到GitHub
     hexo clean # 有时候配置没有立即生效需要删除cache
 
-# 5 修改这个主题
+# 4 修改这个主题
 
-## 5.1 添加新文章
+## 4.1 添加新文章
 
     $ hexo new [layout] <title>
 Layout包括：post、page 和 draft
@@ -140,7 +141,7 @@ Hexo 默认以标题做为文件名称`:title.md`：
 
 两者都自动生成title和date，但是后者更便于管理。    
 
-## 5.2 修改主页
+## 4.2 修改主页
 首先对比主页`<foldername>/themes/jekyll/layout/index.jade`:
 
     extends _partial/layout
@@ -199,7 +200,7 @@ see more: [Jade Syntax Documentatio](http://naltatis.github.io/jade-syntax-docs/
     // single line comment
     //- invisible single line comment
 
-## 5.3 修改头部导航    
+## 4.3 修改头部导航    
 从这里`/layout/_components/nav.jade`添加修改menu
 
         nav
@@ -218,7 +219,7 @@ see more: [Jade Syntax Documentatio](http://naltatis.github.io/jade-syntax-docs/
                 //        = __('github.title')
 依个人口味酌情修改即可。除此之外，RSS插件[安装之后][6]本地预览是没效果的，一般部署之后过段时间才有效
 
-## 5.4 侧边栏
+## 4.4 侧边栏
 `layout/_sidebar/`包含post.jade、tag.jade、和toc.jade三个部件，理论上都可以添加到archive.jade
 
     extends _partial/layout
@@ -239,9 +240,9 @@ see more: [Jade Syntax Documentatio](http://naltatis.github.io/jade-syntax-docs/
         3|   != list_tags({amount: 5, show_count: false})
         4|            
 
-有待达人解决
+有待牛人解决
 
-## 5.5 最后如果使用这个主题有兴趣和问题希望到[这里][12]多多交流        
+## 4.5 最后如果使用这个主题有兴趣和问题可以到[这里][12]多多交流        
 
 [1]: http://www.ruanyifeng.com/blog/2012/08/blogging_with_jekyll.html "搭建一个免费的，无限流量的Blog----github Pages和Jekyll入门"
 [2]: https://pages.github.com/

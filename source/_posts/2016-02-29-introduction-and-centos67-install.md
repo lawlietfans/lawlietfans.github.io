@@ -14,6 +14,8 @@ categories: [Linux, centos67]
 本系列教程全部都是基于vmware 11.1+ centos 6.7 i386的，宿主机为Windows7 x64操作系统。  
 本文内容包括：发展史；自由软件文化；Linux系统的优势；安装使用。
 
+<!-- more -->
+
 CentOS是Community ENTerprise Operating System的简称，是Linux的一个发行版本。发行版其实就是一些整合的安装套件，它是由一些有系统整合能力的工作小组、机构或商业化公司等主动搜集并整合了网络上的部分Linux程序，把系统内核、附带的工具程序以及应用软件包等打包在一起，组成的一个Linux操作系统的集合体。安装者可以一次安装一个包括各种程序在内的完整系统，极大地提高了系统的安装效率。
 
 其中RHEL(Red Hat Enterprise Linux)是很多企业采用的linux发行版本，需要向RedHat付费才可以使用，并能得到付过费用的服务和技术支持和版本升级。CentOS是RHEL的克隆版本，可以像REHL一样的构筑linux系统环境，但不需要向RedHat付任何的费用，同样也得不到任何有偿技术支持和升级服务。
