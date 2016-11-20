@@ -1,4 +1,7 @@
 #!/bin/bash
+# 1. deploy to github
+rake deploy
+# 2. copy and deploy to coding
 rm -rf ../lawlietfans/* #centos will not delete `.` folder/file
 cp -r public/* ../lawlietfans/
 

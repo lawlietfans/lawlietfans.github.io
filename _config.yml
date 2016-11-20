@@ -92,6 +92,8 @@ delicious_user:
 delicious_count: 3
 
 # duoshuo comments
+duoshuo_comments: true
+duoshuo_short_name: lawlietfans-coding
 
 # Google Analytics
 google_analytics_tracking_id:

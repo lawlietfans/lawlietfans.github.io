@@ -17,6 +17,8 @@ OUTLINE
 
 >原文地址：http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/
 
+<!-- more -->
+
 [上一篇](http://lawlietfans.coding.me/blog/2016/02/29/introduction-and-centos67-install/)提到，Linux发行版就是把系统内核、附带的工具程序以及应用软件包等打包在一起，组成的一个集合体或者套件。而CentOS是其中一种发行版。
 这是Linux操作系统的结构。
 
@@ -28,7 +30,6 @@ OUTLINE
 
 Linux下的工具是非常丰富的，任何一个程序员都可以共享自己做的小工具。如果我们想要掌握这些工具的使用。最好是系统看书比如《鸟哥的私房菜》。不想看书的话，搜到的有些资料内容比较零散，有的可能像百科一样，太过于全面[1]。这里试图从初学者用的角度来了解、演示一些常用管理工具。
 
-<!-- more -->
 
 # Step by step
 
