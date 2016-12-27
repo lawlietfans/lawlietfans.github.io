@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://lawlietfans.coding.me/blog/2016/12/27/how-to-setup-ST3-dev-env/</loc>
+<lastmod>2016-12-27T20:00:00+08:00</lastmod>
+</url>
+<url>
 <loc>http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/</loc>
 <lastmod>2016-03-07T20:00:00+08:00</lastmod>
 </url>
@@ -35,5 +39,8 @@
 </url>
 <url>
 <loc>http://lawlietfans.coding.me/blog/categories/centos67/</loc>
+</url>
+<url>
+<loc>http://lawlietfans.coding.me/blog/categories/tools/</loc>
 </url>
 </urlset>
