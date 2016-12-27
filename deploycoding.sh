@@ -1,4 +1,6 @@
 #!/bin/bash
+# generate
+rake generate
 # 1. deploy to github
 rake deploy
 # 2. copy and deploy to coding
