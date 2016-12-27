@@ -17,7 +17,7 @@ sublime的设置包括自定义设置以及插件系统。
 
 打开菜单`Preferences -> Settings`，编辑自定义设置（json格式）
 
-```cc
+```json
 {
 	"caret_style": "phase",
 	"theme": "Spacegray.sublime-theme",

@@ -1,13 +1,14 @@
 #!/bin/bash
-# generate
-rake generate
+# 流程
+# step1. rake generate  # 查看是否正确输出，md中语法错误会导致生成失败
+# step2. auto deploy steps as follows：
 # 1. deploy to github
 rake deploy
 # 2. copy and deploy to coding
 rm -rf ../lawlietfans/* #centos will not delete `.` folder/file
 cp -r public/* ../lawlietfans/
 
-#push
+# 3. deploy to coding
 cd ../lawlietfans
 #$ DATE=$(date +%Y-%m-%d)
 #$ DATE=$(date) utc time
