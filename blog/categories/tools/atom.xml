@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Tools | 畑鹿驚 - 博客]]></title>
   <link href="http://lawlietfans.coding.me/blog/categories/tools/atom.xml" rel="self"/>
   <link href="http://lawlietfans.coding.me/"/>
-  <updated>2016-12-27T21:42:06+08:00</updated>
+  <updated>2016-12-27T21:52:58+08:00</updated>
   <id>http://lawlietfans.coding.me/</id>
   <author>
     <name><![CDATA[lawlietfans]]></name>
@@ -29,7 +29,7 @@
 
 <p>打开菜单<code>Preferences -&gt; Settings</code>，编辑自定义设置（json格式）</p>
 
-<pre><code class="cc">{
+<pre><code class="json">{
     "caret_style": "phase",
     "theme": "Spacegray.sublime-theme",
   "color_scheme": "Packages/Theme - Spacegray/base16-eighties.dark.tmTheme",

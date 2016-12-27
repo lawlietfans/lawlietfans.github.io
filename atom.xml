@@ -4,7 +4,7 @@
   <title><![CDATA[畑鹿驚 - 博客]]></title>
   <link href="http://lawlietfans.coding.me/atom.xml" rel="self"/>
   <link href="http://lawlietfans.coding.me/"/>
-  <updated>2016-11-20T10:58:10+08:00</updated>
+  <updated>2016-12-27T21:52:58+08:00</updated>
   <id>http://lawlietfans.coding.me/</id>
   <author>
     <name><![CDATA[lawlietfans]]></name>
@@ -14,11 +14,133 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Sublime Text3下快速搭建开发环境]]></title>
+    <link href="http://lawlietfans.coding.me/blog/2016/12/27/how-to-setup-ST3-dev-env/"/>
+    <updated>2016-12-27T20:00:00+08:00</updated>
+    <id>http://lawlietfans.coding.me/blog/2016/12/27/how-to-setup-ST3-dev-env</id>
+    <content type="html"><![CDATA[<p>原文链接：<a href="http://www.cnblogs.com/lawlietfans/p/6224824.html">http://www.cnblogs.com/lawlietfans/p/6224824.html</a></p>
+
+<p>安装好<a href="http://www.sublimetext.com/3">Sublime Text3</a>之后，简单几步就可以搭建一个好用的开发环境。</p>
+
+<p>sublime的设置包括自定义设置以及插件系统。</p>
+
+<!-- more -->
+
+
+<p>打开菜单<code>Preferences -&gt; Settings</code>，编辑自定义设置（json格式）</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;caret_style&quot;</span><span class="p">:</span> <span class="s2">&quot;phase&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;theme&quot;</span><span class="p">:</span> <span class="s2">&quot;Spacegray.sublime-theme&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;color_scheme&quot;</span><span class="p">:</span> <span class="s2">&quot;Packages/Theme - Spacegray/base16-eighties.dark.tmTheme&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;ensure_newline_at_eof_on_save&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;font_face&quot;</span><span class="p">:</span> <span class="s2">&quot;YaHei Consolas Hybrid&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;font_size&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;format_on_save&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;highlight_line&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;highlight_modified_tabs&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;rulers&quot;</span><span class="p">:</span>
+</span><span class='line'>  <span class="p">[</span>
+</span><span class='line'>      <span class="mi">80</span><span class="p">,</span>
+</span><span class='line'>      <span class="mi">100</span>
+</span><span class='line'>  <span class="p">],</span>
+</span><span class='line'>  <span class="nt">&quot;tab_size&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;translate_tabs_to_spaces&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+</span><span class='line'>  <span class="nt">&quot;update_check&quot;</span><span class="p">:</span> <span class="kc">false</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们要通过Package Control安装需要的插件，所以首先安装Package Control</p>
+
+<p>三种方法安装Package control：</p>
+
+<ol>
+<li><code>ctrl+shift+p</code>打开命令板，输入<code>pc</code>可以看到下拉列表出现<code>install package control</code>（模糊识别关键字）</li>
+<li>使用Ctrl+`快捷键或者通过View->Show Console菜单打开命令行，粘贴代码</li>
+<li>手动下载<code>Package Control.sublime-package</code>并复制到Installed Packages/目录</li>
+</ol>
+
+
+<p>方法2、3详见<a href="http://www.cnblogs.com/luoshupeng/archive/2013/09/09/3310777.html">Sublime Text 3 安装Package Control</a></p>
+
+<h1>1 python开发者</h1>
+
+<p>python开发者可能需要如下插件：</p>
+
+<ul>
+<li>autosave：自动保存文件</li>
+<li>AutoPEP8：按照PEP规范调整你的python代码</li>
+<li>IMESupport：中文输入框跟随光标[1]</li>
+<li>SublimeREPL：sublime read–eval–print loop (REPL)插件
+
+<ul>
+<li>通过菜单Tools->SublimeREPL->Python可以进入命令行环境</li>
+<li><a href="https://www.zhihu.com/question/22904994">键位绑定</a></li>
+</ul>
+</li>
+</ul>
+
+
+<p>安装插件gif图演示详见[1]</p>
+
+<h1>2 markdown编写</h1>
+
+<p>只需要满足高亮就可以了。许多博文，包括[2]提到<a href="https://packagecontrol.io/packages/MarkdownEditing">markdown editing</a>插件，可我觉得实在是太难看了，和sublime黑色主题不搭。</p>
+
+<p>这里强烈推荐spacegray主题。</p>
+
+<ul>
+<li><a href="https://packagecontrol.io/packages/Theme%20-%20Spacegray">theme spacegray</a>
+
+<ul>
+<li>自动高亮Markdown关键字</li>
+<li>和sublime原来风格契合，可以同时使得sidebar主题也对应变化。</li>
+</ul>
+</li>
+</ul>
+
+
+<h1>References</h1>
+
+<ol>
+<li><a href="http://www.cnblogs.com/figure9/p/sublime-text-complete-guide.html">http://www.cnblogs.com/figure9/p/sublime-text-complete-guide.html</a></li>
+<li><a href="http://www.cnblogs.com/jadeboy/p/5049340.html">http://www.cnblogs.com/jadeboy/p/5049340.html</a></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Linux服务器配置和管理：一般管理]]></title>
     <link href="http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/"/>
     <updated>2016-03-07T20:00:00+08:00</updated>
     <id>http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation</id>
-    <content type="html"><![CDATA[<p>OUTLINE</p>
+    <content type="html"><![CDATA[<blockquote><p>原文地址：<a href="http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/">http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/</a></p></blockquote>
+
+<!-- more -->
+
+
+<p>OUTLINE</p>
 
 <ul>
 <li>1 Step by step</li>
@@ -27,11 +149,6 @@
 <li>4 文件/目录权限管理</li>
 <li>5 ref</li>
 </ul>
-
-
-<blockquote><p>原文地址：<a href="http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/">http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/</a></p></blockquote>
-
-<!-- more -->
 
 
 <p><a href="http://lawlietfans.coding.me/blog/2016/02/29/introduction-and-centos67-install/">上一篇</a>提到，Linux发行版就是把系统内核、附带的工具程序以及应用软件包等打包在一起，组成的一个集合体或者套件。而CentOS是其中一种发行版。
