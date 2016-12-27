@@ -1,7 +1,10 @@
 #!/bin/bash
 # 流程
-# step1. rake generate  # 查看是否正确输出，md中语法错误会导致生成失败
-# step2. auto deploy steps as follows：
+# step1. 在myblogcontent分支写好md，附带head信息
+# step2. copy到source/_posts
+# step3. rake generate  # 查看是否正确输出，md中语法错误会导致生成失败
+# step4. auto deploy steps as follows：
+
 # 1. deploy to github
 rake deploy
 # 2. copy and deploy to coding
