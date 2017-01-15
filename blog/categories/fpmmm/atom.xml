@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Fpmmm | 畑鹿驚 - 博客]]></title>
+  <link href="http://lawlietfans.coding.me/blog/categories/fpmmm/atom.xml" rel="self"/>
+  <link href="http://lawlietfans.coding.me/"/>
+  <updated>2017-01-15T16:51:38+08:00</updated>
+  <id>http://lawlietfans.coding.me/</id>
+  <author>
+    <name><![CDATA[lawlietfans]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Using-fpmmm+zabbix-monitoring-database-state]]></title>
+    <link href="http://lawlietfans.coding.me/blog/2017/01/15/howto-use-fpmmm-and-zabbix-monitoring-database-state/"/>
+    <updated>2017-01-15T21:00:00+08:00</updated>
+    <id>http://lawlietfans.coding.me/blog/2017/01/15/howto-use-fpmmm-and-zabbix-monitoring-database-state</id>
+    <content type="html"><![CDATA[<p>本文介绍如何通过fpmmm和zabbix来监控客户机上MariaDB数据库运行情况。</p>
+
+<!--more-->
+
+
+<p>首先在客户机安装MariaDB和zabbix，参考<a href="http://www.cnblogs.com/lawlietfans/p/6287192.html#%E5%AE%89%E8%A3%85zabbix">上一篇</a></p>
+
+<p>安装fpmmm的过程主要参考[1]。</p>
+
+<ul>
+<li>安装fpmmm的依赖</li>
+</ul>
+
+
+<pre><code class="sh">shell&gt; yum install php-cli php-process php-mysqli
+shell&gt; cat &lt;&lt; _EOF &gt;/etc/php.d/fpmmm.ini
+variables_order = "EGPCS"
+date.timezone = 'Asia/Shanghai'
+_EOF
+
+shell&gt; rpm -Uvh http://repo.zabbix.com/zabbix/2.2/rhel/7/x86_64/zabbix-release-2.2-1.el7.noarch.rpm
+shell&gt; yum update
+shell&gt; yum install zabbix-sender
+</code></pre>
+
+<ul>
+<li><a href="http://www.fromdual.com/download-performance-monitor">下载</a>并安装fpmmm0.10.5</li>
+</ul>
+
+
+<pre><code class="sh">cd /opt
+tar xf /tmp/fpmmm-0.10.5.tar.gz
+ln -s fpmmm-0.10.5 fpmmm
+</code></pre>
+
+<ul>
+<li>config</li>
+</ul>
+
+
+<pre><code class="sh">mkdir /etc/fpmmm
+cp /opt/fpmmm/tpl/fpmmm.conf.template /etc/fpmmm/fpmmm.conf
+chown -R zabbix: /etc/fpmmm
+</code></pre>
+
+<ul>
+<li>vim <code>/etc/fpmmm/fpmmm.conf</code></li>
+</ul>
+
+
+<pre><code class="sh"># This MUST match Hostname in Zabbix!
+[machine01]
+xxx
+
+# Here you could add a random name of your MySQL/MariaDB instance
+[mysqld01]          # This MUST match Hostname in Zabbix!
+xxx
+</code></pre>
+
+<ul>
+<li>create monitoring user(中创建监控的mysql的用户fpmmm)</li>
+</ul>
+
+
+<pre><code class="sh">MariaDB [(none)]&gt; create user 'fpmmm'@'127.0.0.1' identified by 'your_password';
+MariaDB [(none)]&gt; grant process on *.* to 'fpmmm'@'127.0.0.1';
+MariaDB [(none)]&gt; grant replication client on *.* to 'fpmmm'@'127.0.0.1';
+MariaDB [(none)]&gt; grant select on mysql.user to 'fpmmm'@'127.0.0.1';
+</code></pre>
+
+<p>此时，最好增加replication slave权限</p>
+
+<p><code>GRANT REPLICATION SLAVE ON *.* TO 'user_fpmmm'@'127.0.0.1';</code></p>
+
+<p>这一条官网没有，不过不加的话会在log里面提醒你需要，主要为了show slave hosts。[3]</p>
+
+<ul>
+<li>Adding the zabbix user to the mysql group</li>
+</ul>
+
+
+<p><code>usermod -G mysql zabbix</code></p>
+
+<ul>
+<li>test fpmmm.conf并查看log</li>
+</ul>
+
+
+<pre><code class="sh">$ /opt/fpmmm/bin/fpmmm --config=/etc/fpmmm/fpmmm.conf 
+1
+$ cat /tmp/fpmmm/fpmmm.log
+24634:2016-12-06 16:07:35.296 - ERR :     Cannot read PID file /var/run/mysqld/mysqld.pid (rc=1476).
+24634:2016-12-06 16:07:35.296 - ERR :     Either file does not exist or I have no read permissions.
+24634:2016-12-06 16:07:35.296 - ERR :     Are you sure the process is running?
+24634:2016-12-06 16:07:35.296 - ERR :     Adding the zabbix user to the mysql group might help...
+24634:2016-12-06 16:07:35.296 - ERR :     Module FromDualMySQLprocess got an error (rc=1476).
+24634:2016-12-06 16:07:35.414 - WARN:     Binary Log is disabled. Module 'master' does not make sense for host mysqld... (rc=1308).
+24634:2016-12-06 16:07:35.443 - WARN:     Instance mysqld seems not to be a Slave. (rc=1577).
+</code></pre>
+
+<ul>
+<li>去除ERR
+
+<ul>
+<li>修改pid路径: <code>PidFile = /var/lib/mysql/localhost.pid</code></li>
+<li><a href="http://www.cnblogs.com/xiaoheike/p/5873274.html">打开bin log</a></li>
+</ul>
+</li>
+</ul>
+
+
+<pre><code class="sh">shell&gt; vim /etc/my.cnf
+[client]
+...
+
+[mysqld]
+...
+log-bin=mysql-bin
+
+MariaDB [(none)]&gt; show variables like 'log_bin%';
++---------------------------------+--------------------------------+
+| Variable_name                   | Value                          |
++---------------------------------+--------------------------------+
+| log_bin                         | ON                             |
+| log_bin_basename                | /var/lib/mysql/mysql-bin       |
+| log_bin_index                   | /var/lib/mysql/mysql-bin.index |
+| log_bin_trust_function_creators | OFF                            |
++---------------------------------+--------------------------------+
+</code></pre>
+
+<ul>
+<li>最后再次test fpmmm.conf</li>
+</ul>
+
+
+<pre><code class="sh">$ /opt/fpmmm/bin/fpmmm --config=/etc/fpmmm/fpmmm.conf 
+1
+$ cat /tmp/fpmmm/fpmmm.log
+
+//如果有意外情况，试着以root身份运行该命令
+$ sudo -u root /opt/fpmmm/bin/fpmmm --config=/etc/fpmmm/fpmmm.conf
+</code></pre>
+
+<ul>
+<li>运行</li>
+</ul>
+
+
+<p>测试没问题后，修改zabbix的agent配置文件[2]</p>
+
+<pre><code class="sh">shell&gt; vim /etc/zabbix/zabbix_agentd.conf
+UserParameter=FromDual.MySQL.check,/opt/fpmmm/bin/fpmmm --config=/etc/fpmmm/fpmmm.conf
+shell&gt; systemctl restart zabbix-agent
+</code></pre>
+
+<ul>
+<li>把fpmmm自带的模版导入到zabbix中</li>
+</ul>
+
+
+<p>tpl文件的具体作用[4]</p>
+
+<p>Template_FromDual.MySQL.mpm.xml (监控mpm agent本身,这个必须导入)<br/>
+Template_FromDual.MySQL.server.xml (监控Linux系统跟数据库使用相关的附加项)<br/>
+Template_FromDual.MySQL.process.xml (监控各种Linux进程[比如:mysqld,ndbd])<br/>
+Template_FromDual.MySQL.mysql.xml (监控MySQL常用状态变量)<br/>
+Template_FromDual.MySQL.innodb.xml (监控InnoDB存储引擎状态变量)<br/>
+Template_FromDual.MySQL.myisam.xml (监控MyISAM存储引擎状态变量)<br/>
+Template_FromDual.MySQL.master.xml (监控MySQL主从复制的Master状态)<br/>
+Template_FromDual.MySQL.slave.xml (监控MySQL主从复制的Slave状态)</p>
+
+<p>MPM其它用途的模板:<br/>
+Template_FromDual.MySQL.ndb.xml (监控MySQL Cluster)<br/>
+Template_FromDual.MySQL.galera.xml (监控MySQL Galera Cluster)<br/>
+Template_FromDual.MySQL.pbxt.xml (监控PBXT存储引擎状态变量)<br/>
+Template_FromDual.MySQL.aria.xml (监控Aria存储引擎的状态变量)<br/>
+Template_FromDual.MySQL.drbd.xml (监控DRBD设备状态信息</p>
+
+<ul>
+<li>在zabbix管理界面创建两个host</li>
+</ul>
+
+
+<p>其中一个监控机器(one for the machine): 导入fpmmm和server这两个模版</p>
+
+<p>另一个监控数据库(and one for the database): 导入其他templates</p>
+
+<p>注意Agent interface为当前agent的ip地址。</p>
+
+<ul>
+<li>定时运行fpmmm agent</li>
+</ul>
+
+
+<pre><code class="sh">shell&gt; echo "UserParameter=FromDual.MySQL.check,/opt/fpmmm/bin/fpmmm --config=/etc/fpmmm/fpmmm.conf" &gt; /etc/zabbix/zabbix_agentd.d/fpmmm.conf
+</code></pre>
+
+<p>注意上面的命令不能实现定时运行，要用用crontab实现。
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; vim /etc/crontab
+</span><span class='line'>* * * * * root <span class="nb">echo</span> <span class="p">&amp;</span>ldquo<span class="p">;&amp;</span>rdquo<span class="p">;</span> &gt;&gt; /tmp/fpmmm/fpmmm.log <span class="p">&amp;</span>amp<span class="p">;</span> /opt/fpmmm/bin/fpmmm <span class="p">&amp;</span>ndash<span class="p">;</span><span class="nv">config</span><span class="o">=</span>/etc/fpmmm/fpmmm.conf &gt;/dev/null
+</span><span class='line'>shell&gt; tail /tmp/fpmmm/fpmmm.log&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;67721:2016-12-14 15:39:01.293 - INFO: FromDual Performance Monitor <span class="k">for</span> MySQL and MariaDB <span class="o">(</span>fpmmm<span class="o">)</span> <span class="o">(</span>0.10.5<span class="o">)</span> run started.
+</span><span class='line'>67721:2016-12-14 15:39:02.587 - INFO: FromDual Performance Monitor <span class="k">for</span> MySQL and MariaDB <span class="o">(</span>fpmmm<span class="o">)</span> run finished <span class="o">(</span><span class="nv">rc</span><span class="o">=</span>0<span class="o">)</span>.&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;68008:2016-12-14 15:40:01.650 - INFO: FromDual Performance Monitor <span class="k">for</span> MySQL and MariaDB <span class="o">(</span>fpmmm<span class="o">)</span> <span class="o">(</span>0.10.5<span class="o">)</span> run started.
+</span><span class='line'>68008:2016-12-14 15:40:02.944 - INFO: FromDual Performance Monitor <span class="k">for</span> MySQL and MariaDB <span class="o">(</span>fpmmm<span class="o">)</span> run finished <span class="o">(</span><span class="nv">rc</span><span class="o">=</span>0<span class="o">)</span>.
+</span></code></pre></td></tr></table></div></figure></p>
+
+<ul>
+<li>不使用fpmmm如何监控数据库运行状态？</li>
+</ul>
+
+
+<p>see also <a href="http://www.yuminstall.com/zabbix-monitoring-mysql.html">使用zabbix2.2自带的mysql template，设置并查看mysql监控情况</a></p>
+
+<h1>References</h1>
+
+<ol>
+<li><a href="http://www.fromdual.com/fpmmm-installation-guide">FPMMM INSTALLATION GUIDE</a></li>
+<li><a href="http://ixhao.blog.51cto.com/11988319/1847221">Zabbix配合fpmmm(mpm)实现对Mysql的全面监控</a></li>
+<li><a href="http://www.cnblogs.com/zejin2008/p/5416441.html">http://www.cnblogs.com/zejin2008/p/5416441.html</a></li>
+<li><a href="http://www.linuxea.com/1304.html">Zabbix+Mysql Fpmmm（MPM）监控</a></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+</feed>

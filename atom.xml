@@ -4,7 +4,7 @@
   <title><![CDATA[畑鹿驚 - 博客]]></title>
   <link href="http://lawlietfans.coding.me/atom.xml" rel="self"/>
   <link href="http://lawlietfans.coding.me/"/>
-  <updated>2016-12-27T21:52:58+08:00</updated>
+  <updated>2017-01-15T16:51:38+08:00</updated>
   <id>http://lawlietfans.coding.me/</id>
   <author>
     <name><![CDATA[lawlietfans]]></name>
@@ -12,6 +12,857 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Using-fpmmm+zabbix-monitoring-database-state]]></title>
+    <link href="http://lawlietfans.coding.me/blog/2017/01/15/howto-use-fpmmm-and-zabbix-monitoring-database-state/"/>
+    <updated>2017-01-15T21:00:00+08:00</updated>
+    <id>http://lawlietfans.coding.me/blog/2017/01/15/howto-use-fpmmm-and-zabbix-monitoring-database-state</id>
+    <content type="html"><![CDATA[<p>本文介绍如何通过fpmmm和zabbix来监控客户机上MariaDB数据库运行情况。</p>
+
+<!--more-->
+
+
+<p>首先在客户机安装MariaDB和zabbix，参考<a href="http://www.cnblogs.com/lawlietfans/p/6287192.html#%E5%AE%89%E8%A3%85zabbix">上一篇</a></p>
+
+<p>安装fpmmm的过程主要参考[1]。</p>
+
+<ul>
+<li>安装fpmmm的依赖</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; yum install php-cli php-process php-mysqli
+</span><span class='line'>shell&gt; cat <span class="s">&lt;&lt; _EOF &gt;/etc/php.d/fpmmm.ini</span>
+</span><span class='line'><span class="s">variables_order = &quot;EGPCS&quot;</span>
+</span><span class='line'><span class="s">date.timezone = &#39;Asia/Shanghai&#39;</span>
+</span><span class='line'><span class="s">_EOF</span>
+</span><span class='line'>
+</span><span class='line'>shell&gt; rpm -Uvh http://repo.zabbix.com/zabbix/2.2/rhel/7/x86_64/zabbix-release-2.2-1.el7.noarch.rpm
+</span><span class='line'>shell&gt; yum update
+</span><span class='line'>shell&gt; yum install zabbix-sender
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><a href="http://www.fromdual.com/download-performance-monitor">下载</a>并安装fpmmm0.10.5</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">cd</span> /opt
+</span><span class='line'>tar xf /tmp/fpmmm-0.10.5.tar.gz
+</span><span class='line'>ln -s fpmmm-0.10.5 fpmmm
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>config</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mkdir /etc/fpmmm
+</span><span class='line'>cp /opt/fpmmm/tpl/fpmmm.conf.template /etc/fpmmm/fpmmm.conf
+</span><span class='line'>chown -R zabbix: /etc/fpmmm
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>vim <code>/etc/fpmmm/fpmmm.conf</code></li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># This MUST match Hostname in Zabbix!</span>
+</span><span class='line'><span class="o">[</span>machine01<span class="o">]</span>
+</span><span class='line'>xxx
+</span><span class='line'>
+</span><span class='line'><span class="c"># Here you could add a random name of your MySQL/MariaDB instance</span>
+</span><span class='line'><span class="o">[</span>mysqld01<span class="o">]</span>          <span class="c"># This MUST match Hostname in Zabbix!</span>
+</span><span class='line'>xxx
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>create monitoring user(中创建监控的mysql的用户fpmmm)</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>MariaDB <span class="o">[(</span>none<span class="o">)]</span>&gt; create user <span class="s1">&#39;fpmmm&#39;</span>@<span class="s1">&#39;127.0.0.1&#39;</span> identified by <span class="s1">&#39;your_password&#39;</span><span class="p">;</span>
+</span><span class='line'>MariaDB <span class="o">[(</span>none<span class="o">)]</span>&gt; grant process on *.* to <span class="s1">&#39;fpmmm&#39;</span>@<span class="s1">&#39;127.0.0.1&#39;</span><span class="p">;</span>
+</span><span class='line'>MariaDB <span class="o">[(</span>none<span class="o">)]</span>&gt; grant replication client on *.* to <span class="s1">&#39;fpmmm&#39;</span>@<span class="s1">&#39;127.0.0.1&#39;</span><span class="p">;</span>
+</span><span class='line'>MariaDB <span class="o">[(</span>none<span class="o">)]</span>&gt; grant <span class="k">select</span> on mysql.user to <span class="s1">&#39;fpmmm&#39;</span>@<span class="s1">&#39;127.0.0.1&#39;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>此时，最好增加replication slave权限</p>
+
+<p><code>GRANT REPLICATION SLAVE ON *.* TO 'user_fpmmm'@'127.0.0.1';</code></p>
+
+<p>这一条官网没有，不过不加的话会在log里面提醒你需要，主要为了show slave hosts。[3]</p>
+
+<ul>
+<li>Adding the zabbix user to the mysql group</li>
+</ul>
+
+
+<p><code>usermod -G mysql zabbix</code></p>
+
+<ul>
+<li>test fpmmm.conf并查看log</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>/opt/fpmmm/bin/fpmmm --config<span class="o">=</span>/etc/fpmmm/fpmmm.conf
+</span><span class='line'>1
+</span><span class='line'><span class="nv">$ </span>cat /tmp/fpmmm/fpmmm.log
+</span><span class='line'>24634:2016-12-06 16:07:35.296 - ERR :     Cannot <span class="nb">read </span>PID file /var/run/mysqld/mysqld.pid <span class="o">(</span><span class="nv">rc</span><span class="o">=</span>1476<span class="o">)</span>.
+</span><span class='line'>24634:2016-12-06 16:07:35.296 - ERR :     Either file does not exist or I have no <span class="nb">read </span>permissions.
+</span><span class='line'>24634:2016-12-06 16:07:35.296 - ERR :     Are you sure the process is running?
+</span><span class='line'>24634:2016-12-06 16:07:35.296 - ERR :     Adding the zabbix user to the mysql group might help...
+</span><span class='line'>24634:2016-12-06 16:07:35.296 - ERR :     Module FromDualMySQLprocess got an error <span class="o">(</span><span class="nv">rc</span><span class="o">=</span>1476<span class="o">)</span>.
+</span><span class='line'>24634:2016-12-06 16:07:35.414 - WARN:     Binary Log is disabled. Module <span class="s1">&#39;master&#39;</span> does not make sense <span class="k">for</span> host mysqld... <span class="o">(</span><span class="nv">rc</span><span class="o">=</span>1308<span class="o">)</span>.
+</span><span class='line'>24634:2016-12-06 16:07:35.443 - WARN:     Instance mysqld seems not to be a Slave. <span class="o">(</span><span class="nv">rc</span><span class="o">=</span>1577<span class="o">)</span>.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>去除ERR
+
+<ul>
+<li>修改pid路径: <code>PidFile = /var/lib/mysql/localhost.pid</code></li>
+<li><a href="http://www.cnblogs.com/xiaoheike/p/5873274.html">打开bin log</a></li>
+</ul>
+</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; vim /etc/my.cnf
+</span><span class='line'><span class="o">[</span>client<span class="o">]</span>
+</span><span class='line'>...
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>mysqld<span class="o">]</span>
+</span><span class='line'>...
+</span><span class='line'>log-bin<span class="o">=</span>mysql-bin
+</span><span class='line'>
+</span><span class='line'>MariaDB <span class="o">[(</span>none<span class="o">)]</span>&gt; show variables like <span class="s1">&#39;log_bin%&#39;</span><span class="p">;</span>
+</span><span class='line'>+---------------------------------+--------------------------------+
+</span><span class='line'><span class="p">|</span> Variable_name                   <span class="p">|</span> Value                          <span class="p">|</span>
+</span><span class='line'>+---------------------------------+--------------------------------+
+</span><span class='line'><span class="p">|</span> log_bin                         <span class="p">|</span> ON                             <span class="p">|</span>
+</span><span class='line'><span class="p">|</span> log_bin_basename                <span class="p">|</span> /var/lib/mysql/mysql-bin       <span class="p">|</span>
+</span><span class='line'><span class="p">|</span> log_bin_index                   <span class="p">|</span> /var/lib/mysql/mysql-bin.index <span class="p">|</span>
+</span><span class='line'><span class="p">|</span> log_bin_trust_function_creators <span class="p">|</span> OFF                            <span class="p">|</span>
+</span><span class='line'>+---------------------------------+--------------------------------+
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>最后再次test fpmmm.conf</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>/opt/fpmmm/bin/fpmmm --config<span class="o">=</span>/etc/fpmmm/fpmmm.conf
+</span><span class='line'>1
+</span><span class='line'><span class="nv">$ </span>cat /tmp/fpmmm/fpmmm.log
+</span><span class='line'>
+</span><span class='line'>//如果有意外情况，试着以root身份运行该命令
+</span><span class='line'><span class="nv">$ </span>sudo -u root /opt/fpmmm/bin/fpmmm --config<span class="o">=</span>/etc/fpmmm/fpmmm.conf
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>运行</li>
+</ul>
+
+
+<p>测试没问题后，修改zabbix的agent配置文件[2]</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; vim /etc/zabbix/zabbix_agentd.conf
+</span><span class='line'><span class="nv">UserParameter</span><span class="o">=</span>FromDual.MySQL.check,/opt/fpmmm/bin/fpmmm --config<span class="o">=</span>/etc/fpmmm/fpmmm.conf
+</span><span class='line'>shell&gt; systemctl restart zabbix-agent
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>把fpmmm自带的模版导入到zabbix中</li>
+</ul>
+
+
+<p>tpl文件的具体作用[4]</p>
+
+<p>Template_FromDual.MySQL.mpm.xml (监控mpm agent本身,这个必须导入)<br/>
+Template_FromDual.MySQL.server.xml (监控Linux系统跟数据库使用相关的附加项)<br/>
+Template_FromDual.MySQL.process.xml (监控各种Linux进程[比如:mysqld,ndbd])<br/>
+Template_FromDual.MySQL.mysql.xml (监控MySQL常用状态变量)<br/>
+Template_FromDual.MySQL.innodb.xml (监控InnoDB存储引擎状态变量)<br/>
+Template_FromDual.MySQL.myisam.xml (监控MyISAM存储引擎状态变量)<br/>
+Template_FromDual.MySQL.master.xml (监控MySQL主从复制的Master状态)<br/>
+Template_FromDual.MySQL.slave.xml (监控MySQL主从复制的Slave状态)</p>
+
+<p>MPM其它用途的模板:<br/>
+Template_FromDual.MySQL.ndb.xml (监控MySQL Cluster)<br/>
+Template_FromDual.MySQL.galera.xml (监控MySQL Galera Cluster)<br/>
+Template_FromDual.MySQL.pbxt.xml (监控PBXT存储引擎状态变量)<br/>
+Template_FromDual.MySQL.aria.xml (监控Aria存储引擎的状态变量)<br/>
+Template_FromDual.MySQL.drbd.xml (监控DRBD设备状态信息</p>
+
+<ul>
+<li>在zabbix管理界面创建两个host</li>
+</ul>
+
+
+<p>其中一个监控机器(one for the machine): 导入fpmmm和server这两个模版</p>
+
+<p>另一个监控数据库(and one for the database): 导入其他templates</p>
+
+<p>注意Agent interface为当前agent的ip地址。</p>
+
+<ul>
+<li>定时运行fpmmm agent</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; <span class="nb">echo</span> <span class="s2">&quot;UserParameter=FromDual.MySQL.check,/opt/fpmmm/bin/fpmmm --config=/etc/fpmmm/fpmmm.conf&quot;</span> &gt; /etc/zabbix/zabbix_agentd.d/fpmmm.conf
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>注意上面的命令不能实现定时运行，要用用crontab实现。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; vim /etc/crontab
+</span><span class='line'>* * * * * root <span class="nb">echo</span> <span class="s2">&quot;&quot;</span> &gt;&gt; /tmp/fpmmm/fpmmm.log <span class="p">&amp;</span> /opt/fpmmm/bin/fpmmm --config<span class="o">=</span>/etc/fpmmm/fpmmm.conf &gt;/dev/null
+</span><span class='line'>shell&gt; tail /tmp/fpmmm/fpmmm.log
+</span><span class='line'>
+</span><span class='line'>67721:2016-12-14 15:39:01.293 - INFO: FromDual Performance Monitor <span class="k">for</span> MySQL and MariaDB <span class="o">(</span>fpmmm<span class="o">)</span> <span class="o">(</span>0.10.5<span class="o">)</span> run started.
+</span><span class='line'>67721:2016-12-14 15:39:02.587 - INFO: FromDual Performance Monitor <span class="k">for</span> MySQL and MariaDB <span class="o">(</span>fpmmm<span class="o">)</span> run finished <span class="o">(</span><span class="nv">rc</span><span class="o">=</span>0<span class="o">)</span>.
+</span><span class='line'>
+</span><span class='line'>68008:2016-12-14 15:40:01.650 - INFO: FromDual Performance Monitor <span class="k">for</span> MySQL and MariaDB <span class="o">(</span>fpmmm<span class="o">)</span> <span class="o">(</span>0.10.5<span class="o">)</span> run started.
+</span><span class='line'>68008:2016-12-14 15:40:02.944 - INFO: FromDual Performance Monitor <span class="k">for</span> MySQL and MariaDB <span class="o">(</span>fpmmm<span class="o">)</span> run finished <span class="o">(</span><span class="nv">rc</span><span class="o">=</span>0<span class="o">)</span>.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>不使用fpmmm如何监控数据库运行状态？</li>
+</ul>
+
+
+<p>see also <a href="http://www.yuminstall.com/zabbix-monitoring-mysql.html">使用zabbix2.2自带的mysql template，设置并查看mysql监控情况</a></p>
+
+<h1>References</h1>
+
+<ol>
+<li><a href="http://www.fromdual.com/fpmmm-installation-guide">FPMMM INSTALLATION GUIDE</a></li>
+<li><a href="http://ixhao.blog.51cto.com/11988319/1847221">Zabbix配合fpmmm(mpm)实现对Mysql的全面监控</a></li>
+<li><a href="http://www.cnblogs.com/zejin2008/p/5416441.html">http://www.cnblogs.com/zejin2008/p/5416441.html</a></li>
+<li><a href="http://www.linuxea.com/1304.html">Zabbix+Mysql Fpmmm（MPM）监控</a></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Zabbix-quick-start]]></title>
+    <link href="http://lawlietfans.coding.me/blog/2017/01/15/zabbix-quick-start/"/>
+    <updated>2017-01-15T20:00:00+08:00</updated>
+    <id>http://lawlietfans.coding.me/blog/2017/01/15/zabbix-quick-start</id>
+    <content type="html"><![CDATA[<p>Zabbix is an enterprise-class open source distributed monitoring solution.[1]</p>
+
+<p>Zabbix是一个企业级的、开源的、分布式的监控套件</p>
+
+<ul>
+<li>Zabbix可以监控网络和服务的监控状况.</li>
+<li>Zabbix利用灵活的告警机制，允许用户对事件发送基于Email的告警. 这样可以保证快速的对问题作出相应.</li>
+<li>Zabbix是零成本的. 因为Zabbix编写和发布基于GPL V2协议. 意味着源代码是免费发布的.</li>
+</ul>
+
+
+<!--more-->
+
+
+<p>Zabbix特性如下[2]：</p>
+
+<ol>
+<li>数据收集</li>
+<li>灵活的阀值定义</li>
+<li>高级告警配置</li>
+<li>实时绘图</li>
+<li>扩展的图形化显示</li>
+<li>历史数据存储</li>
+<li>配置简单</li>
+<li>模板使用</li>
+<li>网络自动发现</li>
+<li>快速的web接口</li>
+<li>Zabbix API</li>
+<li>权限系统</li>
+<li>全特性、agent易扩展</li>
+<li>二进制守护进程</li>
+<li>具备应对复杂环境情况</li>
+</ol>
+
+
+<p>可以总结为如下三个特点</p>
+
+<p>1）灵活的通知机制：allows users to configure e-mail based alerts for virtually any event；</p>
+
+<p>2）数据可视化；</p>
+
+<p>3）所有报告、统计、参数配置都可通过web端完成；</p>
+
+<p>所以zabbix很适合服务器集群管理员进行功能规划(capacity planning)</p>
+
+<h1>1 概览</h1>
+
+<ul>
+<li>架构
+
+<ul>
+<li>Server</li>
+<li>database storage</li>
+<li>web interface</li>
+<li>proxy</li>
+<li>agent</li>
+</ul>
+</li>
+<li>数据流(data flow)</li>
+</ul>
+
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115155021369-2100463231.png" alt="arch" /></p>
+
+<p>其中，Zabbix Server为中心组件，用来获取agent存活状况及监控数据和统计. 所有的配置、统计、操作数据均通过Server进行存取.</p>
+
+<p>Zabbix agent部署在被监控机器上用来监控本地资源和应用（如硬盘、内存、处理器统计等）</p>
+
+<h1>2 术语概念</h1>
+
+<h2>2.1 server / client / proxy</h2>
+
+<p>Zabbix server的功能可以分为三部分：server、web前端和database。</p>
+
+<p>Server执行polling和trapping来采集数据，评估是否触发触发器，发送报警给用户</p>
+
+<p>agent向其报告有效数据和统计。</p>
+
+<p>database存储所有configuration, statistical and operational data。</p>
+
+<p>server和web前端都与database进行交互。</p>
+
+<p>Zabbix server以守护(daemon)进程方式运行</p>
+
+<h2>2.2 命令行工具</h2>
+
+<p>Sender / Get</p>
+
+<h1>3 zabbix进程构成 [3]</h1>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="err">默认情况下</span><span class="n">zabbix</span><span class="err">包含</span><span class="mi">5</span><span class="err">个程序：</span>
+</span><span class='line'><span class="n">zabbix_agentd</span><span class="err">、</span><span class="n">zabbix_get</span><span class="err">、</span><span class="n">zabbix_proxy</span><span class="err">、</span><span class="n">zabbix_sender</span><span class="err">、</span><span class="n">zabbix_server</span><span class="err">，另外一个</span><span class="n">zabbix_java_gateway</span><span class="err">是可选</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">zabbix_agentd</span>
+</span><span class='line'><span class="err">客户端守护进程，此进程收集客户端数据，例如</span><span class="n">cpu</span><span class="err">负载、内存、硬盘使用情况等</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">zabbix_get</span>
+</span><span class='line'><span class="n">zabbix</span><span class="err">工具，单独使用的命令，通常在</span><span class="n">server</span><span class="err">或者</span><span class="n">proxy</span><span class="err">端执行获取远程客户端信息的命令。</span>
+</span><span class='line'><span class="err">通常用户排错。例如在</span><span class="n">server</span><span class="err">端获取不到客户端的内存数据，我们可以使用</span><span class="n">zabbix_get</span><span class="err">获取客户端的内容的方式来做故障排查。</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">zabbix_sender</span>
+</span><span class='line'><span class="n">zabbix</span><span class="err">工具，用于发送数据给</span><span class="n">server</span><span class="err">或者</span><span class="n">proxy</span><span class="err">，通常用于耗时比较长的检查。</span>
+</span><span class='line'><span class="err">很多检查非常耗时间，导致</span><span class="n">zabbix</span><span class="err">超时。于是我们在脚本执行完毕之后，使用</span><span class="n">sender</span><span class="err">主动提交数据。</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">zabbix_server</span>
+</span><span class='line'><span class="n">zabbix</span><span class="err">服务端守护进程。</span>
+</span><span class='line'><span class="n">zabbix_agentd</span><span class="err">、</span><span class="n">zabbix_get</span><span class="err">、</span><span class="n">zabbix_sender</span><span class="err">、</span><span class="n">zabbix_proxy</span><span class="err">、</span><span class="n">zabbix_java_gateway</span><span class="err">的数据最终都是提交到</span><span class="n">server</span>
+</span><span class='line'><span class="err">备注：当然不是数据都是主动提交给</span><span class="n">zabbix_server</span><span class="p">,</span><span class="err">也有的是</span><span class="n">server</span><span class="err">主动去取数据。</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">zabbix_proxy</span>
+</span><span class='line'><span class="n">zabbix</span><span class="err">代理守护进程。功能类似</span><span class="n">server</span><span class="err">，</span>
+</span><span class='line'><span class="err">唯一不同的是它只是一个中转站，它需要把收集到的数据提交</span><span class="o">/</span><span class="err">被提交到</span><span class="n">server</span><span class="err">里。</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">zabbix_java_gateway</span>
+</span><span class='line'><span class="n">zabbix2</span><span class="mf">.0</span><span class="err">之后引入的一个功能。顾名思义：</span><span class="n">Java</span><span class="err">网关，类似</span><span class="n">agentd</span><span class="err">，但是只用于</span><span class="n">Java</span><span class="err">方面。</span>
+</span><span class='line'><span class="err">需要特别注意的是，它只能主动去获取数据，而不能被动获取数据。它的数据最终会给到</span><span class="n">server</span><span class="err">或者</span><span class="n">proxy</span><span class="err">。</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>4 安装zabbix</h1>
+
+<p>首先安装MariaDB数据库。Linux发行版，使用<a href="https://downloads.mariadb.org/mariadb/repositories/">repository configuration tool</a>，选择自己合适的安装步骤。</p>
+
+<ul>
+<li>卸载mysql</li>
+</ul>
+
+
+<p>如果已经安装了mysql，需要先卸载mysql，否则安装过程中会出现冲突。</p>
+
+<ul>
+<li>本机选择10.1stable for centos7 x86_64</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>//添加源
+</span><span class='line'>shell&gt; cat /etc/yum.repos.d/mariaDB.repo
+</span><span class='line'><span class="o">[</span>mariadb<span class="o">]</span>
+</span><span class='line'><span class="nv">name</span> <span class="o">=</span> MariaDB
+</span><span class='line'><span class="nv">baseurl</span> <span class="o">=</span> http://yum.mariadb.org/10.1/centos7-amd64
+</span><span class='line'><span class="nv">gpgkey</span><span class="o">=</span>https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+</span><span class='line'><span class="nv">gpgcheck</span><span class="o">=</span>1
+</span><span class='line'>
+</span><span class='line'>shell&gt; yum install MariaDB-server MariaDB-client mariadb
+</span><span class='line'>
+</span><span class='line'>//服务管理，使用如下命令start/stop MariaDB:
+</span><span class='line'>shell&gt; sudo systemctl start mariadb.service <span class="c">#直接用mariadb也行</span>
+</span><span class='line'>shell&gt; sudo systemctl stop mariadb.service
+</span><span class='line'>shell&gt; sudo systemctl <span class="nb">enable </span>mariadb.service <span class="c">#开机自启动</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>从10.1起，Galera Cluster(同步MariaDB数据库的多master集群的工具)默认包含在MariaDB中。</p>
+
+<p>see also <a href="https://mariadb.com/kb/en/mariadb/yum/">Installing MariaDB with yum</a>.</p>
+
+<h2>4.1 zabbix sever [4]</h2>
+
+<p>安装</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; rpm -ivh http://repo.zabbix.com/zabbix/2.2/rhel/7/x86_64/zabbix-release-2.2-1.el7.noarch.rpm
+</span><span class='line'>//for Zabbix server and web frontend with mysql database
+</span><span class='line'>shell&gt; yum install zabbix-server-mysql zabbix-web-mysql
+</span><span class='line'>//可以将server与agent安装在同一台机器
+</span><span class='line'>shell&gt; yum install zabbix-agent
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>创建zabbix数据库以及远程用户</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">[</span><span class="n">user</span><span class="err">@</span><span class="n">host</span> <span class="o">~</span><span class="p">]</span><span class="err">#</span> <span class="n">mysql</span> <span class="o">-</span><span class="n">uroot</span> <span class="o">-</span><span class="n">p</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">MariaDB</span> <span class="p">[(</span><span class="n">none</span><span class="p">)]</span><span class="o">&gt;</span> <span class="n">create</span> <span class="n">database</span> <span class="n">zabbix</span> <span class="n">character</span> <span class="n">set</span> <span class="n">utf8</span> <span class="n">collate</span> <span class="n">utf8_bin</span><span class="p">;</span>
+</span><span class='line'><span class="n">MariaDB</span> <span class="p">[(</span><span class="n">none</span><span class="p">)]</span><span class="o">&gt;</span> <span class="n">grant</span> <span class="n">all</span> <span class="n">privileges</span> <span class="n">on</span> <span class="n">zabbix</span><span class="p">.</span><span class="o">*</span> <span class="n">to</span> <span class="n">zabbix</span><span class="err">@</span><span class="n">localhost</span> <span class="n">identified</span> <span class="n">by</span> <span class="err">&#39;</span><span class="n">your_password</span><span class="err">&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="n">MariaDB</span> <span class="p">[(</span><span class="n">none</span><span class="p">)]</span><span class="o">&gt;</span> <span class="n">grant</span> <span class="n">all</span> <span class="n">privileges</span> <span class="n">on</span> <span class="n">zabbix</span><span class="p">.</span><span class="o">*</span> <span class="n">to</span> <span class="n">zabbix</span><span class="err">@&#39;</span><span class="mf">172.16</span><span class="p">.</span><span class="o">%</span><span class="p">.</span><span class="o">%</span><span class="err">&#39;</span> <span class="n">identified</span> <span class="n">by</span> <span class="err">&#39;</span><span class="n">your_password</span><span class="err">&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="n">MariaDB</span> <span class="p">[(</span><span class="n">none</span><span class="p">)]</span><span class="o">&gt;</span> <span class="n">flush</span> <span class="n">privileges</span><span class="p">;</span>
+</span><span class='line'><span class="n">MariaDB</span> <span class="p">[(</span><span class="n">none</span><span class="p">)]</span><span class="o">&gt;</span> <span class="n">select</span> <span class="n">host</span><span class="p">,</span><span class="n">user</span> <span class="n">from</span> <span class="n">mysql</span><span class="p">.</span><span class="n">user</span><span class="p">;</span>
+</span><span class='line'><span class="o">+-----------------------+--------+</span>
+</span><span class='line'><span class="o">|</span> <span class="n">host</span>                  <span class="o">|</span> <span class="n">user</span>   <span class="o">|</span>
+</span><span class='line'><span class="o">+-----------------------+--------+</span>
+</span><span class='line'><span class="o">|</span> <span class="mf">127.0.0.1</span>             <span class="o">|</span> <span class="n">root</span>   <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="mf">172.16</span><span class="p">.</span><span class="o">%</span><span class="p">.</span><span class="o">%</span>            <span class="o">|</span> <span class="n">zabbix</span> <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="o">::</span><span class="mi">1</span>                   <span class="o">|</span> <span class="n">root</span>   <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">localhost</span>             <span class="o">|</span>        <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">localhost</span>             <span class="o">|</span> <span class="n">fsj</span>    <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">localhost</span>             <span class="o">|</span> <span class="n">root</span>   <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">localhost</span>             <span class="o">|</span> <span class="n">zabbix</span> <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">localhost</span><span class="p">.</span><span class="n">localdomain</span> <span class="o">|</span>        <span class="o">|</span>
+</span><span class='line'><span class="o">+-----------------------+--------+</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>导入初始化schema和data</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; <span class="nb">cd</span> /usr/share/doc/zabbix-server-mysql-2.2.15/create
+</span><span class='line'>shell&gt; mysql -uroot -p  zabbix &lt; schema.sql
+</span><span class='line'>shell&gt; mysql -uroot -p  zabbix &lt; images.sql
+</span><span class='line'>shell&gt; mysql -uroot -p  zabbix &lt; data.sql
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Edit database configuration in zabbix_server.conf</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; vi /etc/zabbix/zabbix_server.conf
+</span><span class='line'><span class="nv">DBHost</span><span class="o">=</span>localhost
+</span><span class='line'><span class="nv">DBName</span><span class="o">=</span>zabbix
+</span><span class='line'><span class="nv">DBUser</span><span class="o">=</span>zabbix
+</span><span class='line'><span class="nv">DBPassword</span><span class="o">=</span>zabbix
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><p>开启zabbix-server服务：systemctl start zabbix-server</p></li>
+<li><p>Editing PHP configuration for Zabbix frontend</p>
+
+<ul>
+<li>修改timezone：<code>php_value date.timezone Asia/Shanghai</code></li>
+<li>重启httpd服务：service httpd restart</li>
+</ul>
+</li>
+</ul>
+
+
+<p>或者通过sed调整php配置[6]</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; sed -i <span class="s1">&#39;s/^.*date.timezone =.*$/date.timezone = Asia\/Shanghai/g&#39;</span> /etc/php.ini
+</span><span class='line'>shell&gt; sed -i <span class="s1">&#39;s/^.*post_max_size =.*$/post_max_size = 16M/g&#39;</span> /etc/php.ini
+</span><span class='line'>shell&gt; sed -i <span class="s1">&#39;s/^.*max_execution_time =.*$/max_execution_time = 300/g&#39;</span> /etc/php.ini
+</span><span class='line'>shell&gt; sed -i <span class="s1">&#39;s/^.*max_input_time =.*$/max_input_time = 300/g&#39;</span> /etc/php.ini
+</span><span class='line'>shell&gt; sed -i <span class="s1">&#39;s/^.* memory_limit =.*$/memory_limit = 128M/g&#39;</span>  /etc/php.ini
+</span><span class='line'>shell&gt; service httpd restart
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>配置服务开机启动</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; chkconfig zabbix-server on
+</span><span class='line'>shell&gt; chkconfig zabbix-agent on
+</span><span class='line'>shell&gt; chkconfig httpd on
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>访问 <a href="http://your-zabbix-server-ip/zabbix">http://your-zabbix-server-ip/zabbix</a></p>
+
+<p>默认username/password 是Admin/zabbix.</p>
+
+<ul>
+<li>如果出现错误：zabbix server is not running</li>
+</ul>
+
+
+<p><a href="https://my.oschina.net/u/1590519/blog/330357">解决办法</a>：设置SELinux 成为permissive模式  <code>shell&gt; setenforce 0</code></p>
+
+<ul>
+<li>如果出现防火墙相关问题，打开agent的端口</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>查看zabbix监听端口：
+</span><span class='line'>shell&gt; netstat -nlop <span class="p">|</span> grep zabbix
+</span><span class='line'>tcp        <span class="m">0</span>      <span class="m">0</span> 0.0.0.0:10051           0.0.0.0:*               LISTEN      23904/zabbix_server  off <span class="o">(</span>0.00/0/0<span class="o">)</span>
+</span><span class='line'>tcp6       <span class="m">0</span>      <span class="m">0</span> :::10051                :::*                    LISTEN      23904/zabbix_server  off <span class="o">(</span>0.00/0/0<span class="o">)</span>
+</span><span class='line'>打开防火墙该端口：
+</span><span class='line'>shell&gt; iptables -I INPUT -p tcp --dport <span class="m">10051</span> -m state --state NEW,ESTABLISHED -j ACCEPT
+</span><span class='line'>shell&gt; iptables -I OUTPUT -p tcp --sport <span class="m">10051</span> -m state --state ESTABLISHED -j ACCEPT
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>也可以批量修改其他端口：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; iptables-save &gt; firewalls.txt
+</span><span class='line'>shell&gt; vim firewalls.txt
+</span><span class='line'>shell&gt; iptables-restore &lt;firewalls.txt
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>或者直接关闭防火墙：<code># systemctl stop firewalld</code></p>
+
+<p>see also <a href="http://www.cnblogs.com/pixy/p/5156739.html">Linux防火墙配置(iptables, firewalld)</a></p>
+
+<h2>4.2 zabbix agent</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; sudo rpm -ivh http://repo.zabbix.com/zabbix/2.2/rhel/7/x86_64/zabbix-release-2.2-1.el7.noarch.rpm
+</span><span class='line'>shell&gt; sudo yum install zabbix-agent zabbix-sender -y
+</span><span class='line'>shell&gt; grep -Ev <span class="s1">&#39;(^$|^#)&#39;</span> /etc/zabbix/zabbix_agentd.conf  <span class="c">#修改server地址</span>
+</span><span class='line'><span class="nv">PidFile</span><span class="o">=</span>/var/run/zabbix/zabbix_agentd.pid
+</span><span class='line'><span class="nv">LogFile</span><span class="o">=</span>/var/log/zabbix/zabbix_agentd.log
+</span><span class='line'><span class="nv">LogFileSize</span><span class="o">=</span>0
+</span><span class='line'><span class="nv">Server</span><span class="o">=</span>172.16.44.5
+</span><span class='line'><span class="nv">Hostname</span><span class="o">=</span>Zabbix server fsj
+</span><span class='line'><span class="nv">Include</span><span class="o">=</span>/etc/zabbix/zabbix_agentd.d/
+</span><span class='line'>
+</span><span class='line'>shell&gt; sudo service zabbix-agent start
+</span><span class='line'>shell&gt; sudo systemctl <span class="nb">enable </span>zabbix-agent
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>5 用户管理</h1>
+
+<p><img src="http://ww1.sinaimg.cn/large/7156462egw1fb0n5yw928j218e0e0jzk.jpg" alt="user list" /></p>
+
+<p><img src="http://ww1.sinaimg.cn/large/7156462egw1fb0njs2v9ij218g0cf7b0.jpg" alt="user groups list" /></p>
+
+<p>权限管理并不是直接设置一个user对应于一个host的什么权限，而是设置user groups对应与host groups的权限。</p>
+
+<p><img src="http://ww3.sinaimg.cn/large/7156462egw1fb0nmppfp0j20vy0futd2.jpg" alt="" /></p>
+
+<p>切换到permissions选项卡</p>
+
+<p><img src="http://ww4.sinaimg.cn/large/7156462egw1fb0nnyipqzj20zh0ohgq8.jpg" alt="" /></p>
+
+<h1>6 开始监控</h1>
+
+<h2>6.1 添加Zabbix agent（局域网其他机器）以及其item</h2>
+
+<p>新建host
+<img src="https://www.zabbix.com/documentation/2.2/_media/manual/quickstart/new_host.png" alt="new host" /></p>
+
+<p>其中，最好有一个Host name项和<code>/etc/zabbix/zabbix_agentd.conf</code>中Hostname保持一致。</p>
+
+<p>如果不存在host与配置文件中的Hostname相同，那么运行之后log文件会报错<code>host xxx(Hostname值) not found</code>，但是前端host条目依然可以获取到数据。</p>
+
+<p>修改conf文件后要重启服务才能生效</p>
+
+<p>新建item
+<img src="https://www.zabbix.com/documentation/2.2/_media/manual/quickstart/new_item.png" alt="new item" /></p>
+
+<p>其中key表示要监测的的信息。
+1. 详细：<a href="https://www.zabbix.com/documentation/2.2/manual/config/items/itemtypes/zabbix_agent">https://www.zabbix.com/documentation/2.2/manual/config/items/itemtypes/zabbix_agent</a>
+2. <a href="https://www.zabbix.com/documentation/2.2/manual/appendix/items/supported_by_platform">Items supported by platform</a></p>
+
+<p>在configuration->hosts页面可看到刚刚添加的host，如果available项为绿色Z表示一切正常。</p>
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115155508338-57307903.png" alt="host list" /></p>
+
+<p>有可能出现如下错误</p>
+
+<blockquote><p>Received empty response from Zabbix Agent at [x.x.x.x]. Assuming that agent dropped connection because of access permission</p></blockquote>
+
+<p>到Monitoring -> Latest data页面查看监控到的实时数据</p>
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115155638994-755881875.png" alt="latest data" /></p>
+
+<p>点击graph可以查看cpu load的折线图。</p>
+
+<h2>6.2 触发器</h2>
+
+<p>一个触发器包括一个定义了数据阈值的<a href="https://www.zabbix.com/documentation/2.2/manual/config/triggers/expression">表达式</a>。</p>
+
+<p>格式为<code>{&lt;server&gt;:&lt;key&gt;.&lt;function&gt;(&lt;parameter&gt;)}&lt;operator&gt;&lt;constant&gt;</code>。<br/>
+其中：
+1. key: 该server定义的item
+2. function: <a href="https://www.zabbix.com/documentation/2.2/manual/appendix/triggers/functions">https://www.zabbix.com/documentation/2.2/manual/appendix/triggers/functions</a>
+3. parameter: 数字n表示n秒，#n表示最近n个值，n[m|h|d]表示n[分钟|小时|天]</p>
+
+<p>输入数据如果高于该阈值，触发器就会报警。</p>
+
+<h3>6.2.1 创建触发器</h3>
+
+<p><img src="https://www.zabbix.com/documentation/2.2/_media/manual/quickstart/new_trigger.png" alt="new trigger" /></p>
+
+<p>激活触发器 <code>shell&gt; cat /dev/urandom | md5sum</code></p>
+
+<p><img src="http://ww4.sinaimg.cn/large/7156462egw1fazje03tolj217q0itgs1.jpg" alt="latest data graph of cpu load" /></p>
+
+<p><img src="http://ww4.sinaimg.cn/large/7156462egw1fazjga5c24j218b0iegsq.jpg" alt="monitoring-triggers" /></p>
+
+<p>更多触发器示例：</p>
+
+<ol>
+<li><code>{www.zabbix.com:system.cpu.load[all,avg1].last()}&gt;5</code></li>
+<li><code>{www.zabbix.com:system.cpu.load[all,avg1].last()}&gt;5|{www.zabbix.com:system.cpu.load[all,avg1].min(10m)}&gt;2</code></li>
+<li><code>{www.zabbix.com:vfs.file.cksum[/etc/passwd].diff()}=1</code></li>
+</ol>
+
+
+<h3>6.2.2 通知</h3>
+
+<p>Administration -> Media type 设置 email（需要有email软件支持）</p>
+
+<p><img src="https://www.zabbix.com/documentation/2.2/_media/manual/quickstart/1.9.7_media_type_email.png" alt="" /></p>
+
+<p>新建action</p>
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115155906385-1184761700.png" alt="" /></p>
+
+<p>查看发送情况</p>
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115160022431-741622625.png" alt="administration audit" /></p>
+
+<p>这里没有设email相关，所以发送失败</p>
+
+<h1>7 使用模版</h1>
+
+<p>点击host，切换到templates选项卡可以关联想要的模版。</p>
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115160241322-10249453.png" alt="" /></p>
+
+<p>我们也可以通过 Configuration → Templates 可以创建空模版。然后把现有的item、trigger等拷贝到该模版，方便以后批量应用。
+<img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115160503838-460061465.png" alt="" /></p>
+
+<h1>References</h1>
+
+<ol>
+<li><a href="https://www.zabbix.com/documentation/2.2/manual">https://www.zabbix.com/documentation/2.2/manual</a></li>
+<li><a href="http://zabbix-manual-in-chinese.readthedocs.io/en/latest/index.html">http://zabbix-manual-in-chinese.readthedocs.io/en/latest/index.html</a></li>
+<li><a href="http://www.ttlsa.com/zabbix/zabbix-section-3-of-chapter-1/">http://www.ttlsa.com/zabbix/zabbix-section-3-of-chapter-1/</a></li>
+<li><a href="https://www.zabbix.com/documentation/2.2/manual/quickstart">https://www.zabbix.com/documentation/2.2/manual/quickstart</a></li>
+<li><a href="http://www.ttlsa.com/zabbix/follow-ttlsa-to-study-zabbix/">跟着ttlsa一起学zabbix监控</a></li>
+<li><a href="http://www.cnblogs.com/Brandyn/p/5443491.html">监控 Zabbix</a></li>
+<li><a href="http://zabbix.org.cn">http://zabbix.org.cn</a></li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Sublime Text3下快速搭建开发环境]]></title>

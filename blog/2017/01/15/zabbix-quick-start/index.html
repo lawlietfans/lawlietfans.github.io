@@ -1,0 +1,743 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Zabbix-quick-start - 畑鹿驚 - 博客</title>
+  <meta name="author" content="lawlietfans">
+
+  
+  <meta name="description" content="Zabbix is an enterprise-class open source distributed monitoring solution.[1] Zabbix是一个企业级的、开源的、分布式的监控套件 Zabbix可以监控网络和服务的监控状况.
+Zabbix利用灵活的告警机制， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://lawlietfans.coding.me/blog/2017/01/15/zabbix-quick-start">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="畑鹿驚 - 博客" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//libs.baidu.com/jquery/1.7.2/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--- MathJax Configuration -->
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+</head>
+
+<body   class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <h1><a href="/">畑鹿驚 - 博客</a></h1>
+  
+    <h2>Oh My God, They killed Kenny!!!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscribe" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS" target="_blank"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25" height="25" viewbox="0 0 100 100"><path class="social" d="M 13.310204,73.332654 C 5.967347,73.332654 0,79.322448 0,86.621428 c 0,7.338776 5.967347,13.262246 13.310204,13.262246 7.370408,0 13.328572,-5.92245 13.328572,-13.262246 0,-7.29898 -5.958164,-13.288774 -13.328572,-13.288774 z M 0.01530612,33.978572 V 53.143878 C 12.493878,53.143878 24.229592,58.02347 33.068368,66.865306 41.894898,75.685714 46.767346,87.47449 46.767346,100 h 19.25 C 66.017346,63.592858 36.4,33.979592 0.01530612,33.978572 l 0,0 z M 0.03877552,0 V 19.17449 C 44.54796,19.17551 80.77551,55.437756 80.77551,100 H 100 C 100,44.87653 55.15102,0 0.03877552,0 z"></path></svg></a></li>
+  
+</ul>
+  
+  
+  
+  
+  
+<ul class="subscribe">
+  <li><a href="https://github.com/lawlietfans" rel="subscribe-github" title="@lawlietfans on GitHub" target="_blank"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25" height="25" viewbox="0 0 100 100"><path class="social" d="M 50,0 C 22.385714,0 0,22.385714 0,50 0,77.614286 22.385714,100 50,100 77.614286,100 100,77.614286 100,50 100,22.385714 77.614286,0 50,0 z m 29.692858,79.692858 c -3.859184,3.859182 -8.351022,6.887754 -13.35,9.00306 -1.27041,0.536736 -2.560204,1.009184 -3.867348,1.415306 v -7.493878 c 0,-3.938774 -1.35102,-6.835714 -4.053062,-8.690816 1.692858,-0.163264 3.24694,-0.390816 4.663266,-0.683672 1.416326,-0.292858 2.913266,-0.716328 4.491838,-1.27041 1.57857,-0.55408 2.994896,-1.213264 4.247958,-1.97755 1.253062,-0.765306 2.458164,-1.758164 3.613266,-2.978572 1.155102,-1.220408 2.12449,-2.604082 2.905102,-4.15 0.780612,-1.545918 1.4,-3.40204 1.855102,-5.566326 0.455102,-2.164286 0.683674,-4.54898 0.683674,-7.153062 0,-5.045918 -1.643878,-9.341836 -4.931634,-12.890816 C 77.44796,33.35 77.285714,29.10204 75.463266,24.512244 l -1.22143,-0.145918 c -0.845918,-0.09796 -2.368366,0.260204 -4.565306,1.07449 -2.196938,0.814286 -4.663264,2.14796 -7.396938,4.004082 -3.87449,-1.07449 -7.893878,-1.611224 -12.061224,-1.611224 -4.19898,0 -8.203062,0.536734 -12.012246,1.611224 -1.72449,-1.17245 -3.361224,-2.139796 -4.907142,-2.905102 C 31.753062,25.77449 30.516326,25.254082 29.587756,24.97653 28.660204,24.7 27.79796,24.528572 27,24.463266 c -0.79796,-0.0653 -1.310204,-0.08062 -1.537756,-0.04898 -0.22755,0.03164 -0.390816,0.0653 -0.487754,0.09796 -1.82347,4.62245 -1.985714,8.87143 -0.487756,12.743878 -3.287754,3.54796 -4.931632,7.844898 -4.931632,12.890816 0,2.604082 0.227552,4.988776 0.683674,7.153062 0.456122,2.164286 1.07449,4.020408 1.855102,5.566326 0.780612,1.545918 1.75,2.929592 2.905102,4.15 1.155102,1.220408 2.360204,2.213266 3.613264,2.978572 1.253062,0.766326 2.669388,1.42449 4.24796,1.97755 1.578572,0.554082 3.07551,0.976532 4.491836,1.27041 1.416328,0.292856 2.970408,0.521428 4.663266,0.683672 -2.669388,1.82347 -4.004082,4.720408 -4.004082,8.690816 v 7.639796 C 36.536734,89.818368 35.083674,89.3 33.656122,88.695918 c -4.99898,-2.115306 -9.490816,-5.143878 -13.35,-9.00306 -3.859184,-3.859184 -6.887754,-8.351022 -9.00306,-13.35 C 9.1163263,61.171428 8.0071428,55.67347 8.0071428,50 c 0,-5.67347 1.1091835,-11.171428 3.2969392,-16.342858 2.115306,-4.998978 5.143878,-9.490816 9.00306,-13.35 3.859184,-3.859182 8.351022,-6.887754 13.35,-9.00306 C 38.828572,9.1163266 44.32653,8.0071428 50,8.0071428 c 5.67347,0 11.171428,1.1091838 16.342858,3.2969392 5,2.115306 9.490816,5.143878 13.35,9.00306 3.859182,3.859184 6.887754,8.351022 9.00306,13.35 2.186736,5.17245 3.295918,10.67041 3.295918,16.342858 0,5.672448 -1.109182,11.171428 -3.296938,16.342858 -2.115306,4.998978 -5.143878,9.490816 -9.00204,13.35 l 0,0 z"></path></svg></a></li>
+</ul>
+  
+  
+  
+  
+  
+  
+  
+  
+    
+      <form action="https://www.baidu.com/search" method="get">
+        <fieldset role="search">
+          <input type="hidden" name="sitesearch" value="lawlietfans.coding.me" />
+    
+          <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+        </fieldset>
+      </form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/category">Category</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Zabbix-quick-start</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2017-01-15T20:00:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>8:00 pm</span></time>
+        
+	
+         | <a href="#comments">Comments</a>
+        
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Zabbix is an enterprise-class open source distributed monitoring solution.[1]</p>
+
+<p>Zabbix是一个企业级的、开源的、分布式的监控套件</p>
+
+<ul>
+<li>Zabbix可以监控网络和服务的监控状况.</li>
+<li>Zabbix利用灵活的告警机制，允许用户对事件发送基于Email的告警. 这样可以保证快速的对问题作出相应.</li>
+<li>Zabbix是零成本的. 因为Zabbix编写和发布基于GPL V2协议. 意味着源代码是免费发布的.</li>
+</ul>
+
+
+<!--more-->
+
+
+<p>Zabbix特性如下[2]：</p>
+
+<ol>
+<li>数据收集</li>
+<li>灵活的阀值定义</li>
+<li>高级告警配置</li>
+<li>实时绘图</li>
+<li>扩展的图形化显示</li>
+<li>历史数据存储</li>
+<li>配置简单</li>
+<li>模板使用</li>
+<li>网络自动发现</li>
+<li>快速的web接口</li>
+<li>Zabbix API</li>
+<li>权限系统</li>
+<li>全特性、agent易扩展</li>
+<li>二进制守护进程</li>
+<li>具备应对复杂环境情况</li>
+</ol>
+
+
+<p>可以总结为如下三个特点</p>
+
+<p>1）灵活的通知机制：allows users to configure e-mail based alerts for virtually any event；</p>
+
+<p>2）数据可视化；</p>
+
+<p>3）所有报告、统计、参数配置都可通过web端完成；</p>
+
+<p>所以zabbix很适合服务器集群管理员进行功能规划(capacity planning)</p>
+
+<h1>1 概览</h1>
+
+<ul>
+<li>架构
+
+<ul>
+<li>Server</li>
+<li>database storage</li>
+<li>web interface</li>
+<li>proxy</li>
+<li>agent</li>
+</ul>
+</li>
+<li>数据流(data flow)</li>
+</ul>
+
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115155021369-2100463231.png" alt="arch" /></p>
+
+<p>其中，Zabbix Server为中心组件，用来获取agent存活状况及监控数据和统计. 所有的配置、统计、操作数据均通过Server进行存取.</p>
+
+<p>Zabbix agent部署在被监控机器上用来监控本地资源和应用（如硬盘、内存、处理器统计等）</p>
+
+<h1>2 术语概念</h1>
+
+<h2>2.1 server / client / proxy</h2>
+
+<p>Zabbix server的功能可以分为三部分：server、web前端和database。</p>
+
+<p>Server执行polling和trapping来采集数据，评估是否触发触发器，发送报警给用户</p>
+
+<p>agent向其报告有效数据和统计。</p>
+
+<p>database存储所有configuration, statistical and operational data。</p>
+
+<p>server和web前端都与database进行交互。</p>
+
+<p>Zabbix server以守护(daemon)进程方式运行</p>
+
+<h2>2.2 命令行工具</h2>
+
+<p>Sender / Get</p>
+
+<h1>3 zabbix进程构成 [3]</h1>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="err">默认情况下</span><span class="n">zabbix</span><span class="err">包含</span><span class="mi">5</span><span class="err">个程序：</span>
+</span><span class='line'><span class="n">zabbix_agentd</span><span class="err">、</span><span class="n">zabbix_get</span><span class="err">、</span><span class="n">zabbix_proxy</span><span class="err">、</span><span class="n">zabbix_sender</span><span class="err">、</span><span class="n">zabbix_server</span><span class="err">，另外一个</span><span class="n">zabbix_java_gateway</span><span class="err">是可选</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">zabbix_agentd</span>
+</span><span class='line'><span class="err">客户端守护进程，此进程收集客户端数据，例如</span><span class="n">cpu</span><span class="err">负载、内存、硬盘使用情况等</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">zabbix_get</span>
+</span><span class='line'><span class="n">zabbix</span><span class="err">工具，单独使用的命令，通常在</span><span class="n">server</span><span class="err">或者</span><span class="n">proxy</span><span class="err">端执行获取远程客户端信息的命令。</span>
+</span><span class='line'><span class="err">通常用户排错。例如在</span><span class="n">server</span><span class="err">端获取不到客户端的内存数据，我们可以使用</span><span class="n">zabbix_get</span><span class="err">获取客户端的内容的方式来做故障排查。</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">zabbix_sender</span>
+</span><span class='line'><span class="n">zabbix</span><span class="err">工具，用于发送数据给</span><span class="n">server</span><span class="err">或者</span><span class="n">proxy</span><span class="err">，通常用于耗时比较长的检查。</span>
+</span><span class='line'><span class="err">很多检查非常耗时间，导致</span><span class="n">zabbix</span><span class="err">超时。于是我们在脚本执行完毕之后，使用</span><span class="n">sender</span><span class="err">主动提交数据。</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">zabbix_server</span>
+</span><span class='line'><span class="n">zabbix</span><span class="err">服务端守护进程。</span>
+</span><span class='line'><span class="n">zabbix_agentd</span><span class="err">、</span><span class="n">zabbix_get</span><span class="err">、</span><span class="n">zabbix_sender</span><span class="err">、</span><span class="n">zabbix_proxy</span><span class="err">、</span><span class="n">zabbix_java_gateway</span><span class="err">的数据最终都是提交到</span><span class="n">server</span>
+</span><span class='line'><span class="err">备注：当然不是数据都是主动提交给</span><span class="n">zabbix_server</span><span class="p">,</span><span class="err">也有的是</span><span class="n">server</span><span class="err">主动去取数据。</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">zabbix_proxy</span>
+</span><span class='line'><span class="n">zabbix</span><span class="err">代理守护进程。功能类似</span><span class="n">server</span><span class="err">，</span>
+</span><span class='line'><span class="err">唯一不同的是它只是一个中转站，它需要把收集到的数据提交</span><span class="o">/</span><span class="err">被提交到</span><span class="n">server</span><span class="err">里。</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">zabbix_java_gateway</span>
+</span><span class='line'><span class="n">zabbix2</span><span class="mf">.0</span><span class="err">之后引入的一个功能。顾名思义：</span><span class="n">Java</span><span class="err">网关，类似</span><span class="n">agentd</span><span class="err">，但是只用于</span><span class="n">Java</span><span class="err">方面。</span>
+</span><span class='line'><span class="err">需要特别注意的是，它只能主动去获取数据，而不能被动获取数据。它的数据最终会给到</span><span class="n">server</span><span class="err">或者</span><span class="n">proxy</span><span class="err">。</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>4 安装zabbix</h1>
+
+<p>首先安装MariaDB数据库。Linux发行版，使用<a href="https://downloads.mariadb.org/mariadb/repositories/">repository configuration tool</a>，选择自己合适的安装步骤。</p>
+
+<ul>
+<li>卸载mysql</li>
+</ul>
+
+
+<p>如果已经安装了mysql，需要先卸载mysql，否则安装过程中会出现冲突。</p>
+
+<ul>
+<li>本机选择10.1stable for centos7 x86_64</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>//添加源
+</span><span class='line'>shell&gt; cat /etc/yum.repos.d/mariaDB.repo
+</span><span class='line'><span class="o">[</span>mariadb<span class="o">]</span>
+</span><span class='line'><span class="nv">name</span> <span class="o">=</span> MariaDB
+</span><span class='line'><span class="nv">baseurl</span> <span class="o">=</span> http://yum.mariadb.org/10.1/centos7-amd64
+</span><span class='line'><span class="nv">gpgkey</span><span class="o">=</span>https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+</span><span class='line'><span class="nv">gpgcheck</span><span class="o">=</span>1
+</span><span class='line'>
+</span><span class='line'>shell&gt; yum install MariaDB-server MariaDB-client mariadb
+</span><span class='line'>
+</span><span class='line'>//服务管理，使用如下命令start/stop MariaDB:
+</span><span class='line'>shell&gt; sudo systemctl start mariadb.service <span class="c">#直接用mariadb也行</span>
+</span><span class='line'>shell&gt; sudo systemctl stop mariadb.service
+</span><span class='line'>shell&gt; sudo systemctl <span class="nb">enable </span>mariadb.service <span class="c">#开机自启动</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>从10.1起，Galera Cluster(同步MariaDB数据库的多master集群的工具)默认包含在MariaDB中。</p>
+
+<p>see also <a href="https://mariadb.com/kb/en/mariadb/yum/">Installing MariaDB with yum</a>.</p>
+
+<h2>4.1 zabbix sever [4]</h2>
+
+<p>安装</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; rpm -ivh http://repo.zabbix.com/zabbix/2.2/rhel/7/x86_64/zabbix-release-2.2-1.el7.noarch.rpm
+</span><span class='line'>//for Zabbix server and web frontend with mysql database
+</span><span class='line'>shell&gt; yum install zabbix-server-mysql zabbix-web-mysql
+</span><span class='line'>//可以将server与agent安装在同一台机器
+</span><span class='line'>shell&gt; yum install zabbix-agent
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>创建zabbix数据库以及远程用户</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">[</span><span class="n">user</span><span class="err">@</span><span class="n">host</span> <span class="o">~</span><span class="p">]</span><span class="err">#</span> <span class="n">mysql</span> <span class="o">-</span><span class="n">uroot</span> <span class="o">-</span><span class="n">p</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">MariaDB</span> <span class="p">[(</span><span class="n">none</span><span class="p">)]</span><span class="o">&gt;</span> <span class="n">create</span> <span class="n">database</span> <span class="n">zabbix</span> <span class="n">character</span> <span class="n">set</span> <span class="n">utf8</span> <span class="n">collate</span> <span class="n">utf8_bin</span><span class="p">;</span>
+</span><span class='line'><span class="n">MariaDB</span> <span class="p">[(</span><span class="n">none</span><span class="p">)]</span><span class="o">&gt;</span> <span class="n">grant</span> <span class="n">all</span> <span class="n">privileges</span> <span class="n">on</span> <span class="n">zabbix</span><span class="p">.</span><span class="o">*</span> <span class="n">to</span> <span class="n">zabbix</span><span class="err">@</span><span class="n">localhost</span> <span class="n">identified</span> <span class="n">by</span> <span class="err">&#39;</span><span class="n">your_password</span><span class="err">&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="n">MariaDB</span> <span class="p">[(</span><span class="n">none</span><span class="p">)]</span><span class="o">&gt;</span> <span class="n">grant</span> <span class="n">all</span> <span class="n">privileges</span> <span class="n">on</span> <span class="n">zabbix</span><span class="p">.</span><span class="o">*</span> <span class="n">to</span> <span class="n">zabbix</span><span class="err">@&#39;</span><span class="mf">172.16</span><span class="p">.</span><span class="o">%</span><span class="p">.</span><span class="o">%</span><span class="err">&#39;</span> <span class="n">identified</span> <span class="n">by</span> <span class="err">&#39;</span><span class="n">your_password</span><span class="err">&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="n">MariaDB</span> <span class="p">[(</span><span class="n">none</span><span class="p">)]</span><span class="o">&gt;</span> <span class="n">flush</span> <span class="n">privileges</span><span class="p">;</span>
+</span><span class='line'><span class="n">MariaDB</span> <span class="p">[(</span><span class="n">none</span><span class="p">)]</span><span class="o">&gt;</span> <span class="n">select</span> <span class="n">host</span><span class="p">,</span><span class="n">user</span> <span class="n">from</span> <span class="n">mysql</span><span class="p">.</span><span class="n">user</span><span class="p">;</span>
+</span><span class='line'><span class="o">+-----------------------+--------+</span>
+</span><span class='line'><span class="o">|</span> <span class="n">host</span>                  <span class="o">|</span> <span class="n">user</span>   <span class="o">|</span>
+</span><span class='line'><span class="o">+-----------------------+--------+</span>
+</span><span class='line'><span class="o">|</span> <span class="mf">127.0.0.1</span>             <span class="o">|</span> <span class="n">root</span>   <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="mf">172.16</span><span class="p">.</span><span class="o">%</span><span class="p">.</span><span class="o">%</span>            <span class="o">|</span> <span class="n">zabbix</span> <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="o">::</span><span class="mi">1</span>                   <span class="o">|</span> <span class="n">root</span>   <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">localhost</span>             <span class="o">|</span>        <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">localhost</span>             <span class="o">|</span> <span class="n">fsj</span>    <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">localhost</span>             <span class="o">|</span> <span class="n">root</span>   <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">localhost</span>             <span class="o">|</span> <span class="n">zabbix</span> <span class="o">|</span>
+</span><span class='line'><span class="o">|</span> <span class="n">localhost</span><span class="p">.</span><span class="n">localdomain</span> <span class="o">|</span>        <span class="o">|</span>
+</span><span class='line'><span class="o">+-----------------------+--------+</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>导入初始化schema和data</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; <span class="nb">cd</span> /usr/share/doc/zabbix-server-mysql-2.2.15/create
+</span><span class='line'>shell&gt; mysql -uroot -p  zabbix &lt; schema.sql
+</span><span class='line'>shell&gt; mysql -uroot -p  zabbix &lt; images.sql
+</span><span class='line'>shell&gt; mysql -uroot -p  zabbix &lt; data.sql
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Edit database configuration in zabbix_server.conf</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; vi /etc/zabbix/zabbix_server.conf
+</span><span class='line'><span class="nv">DBHost</span><span class="o">=</span>localhost
+</span><span class='line'><span class="nv">DBName</span><span class="o">=</span>zabbix
+</span><span class='line'><span class="nv">DBUser</span><span class="o">=</span>zabbix
+</span><span class='line'><span class="nv">DBPassword</span><span class="o">=</span>zabbix
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><p>开启zabbix-server服务：systemctl start zabbix-server</p></li>
+<li><p>Editing PHP configuration for Zabbix frontend</p>
+
+<ul>
+<li>修改timezone：<code>php_value date.timezone Asia/Shanghai</code></li>
+<li>重启httpd服务：service httpd restart</li>
+</ul>
+</li>
+</ul>
+
+
+<p>或者通过sed调整php配置[6]</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; sed -i <span class="s1">&#39;s/^.*date.timezone =.*$/date.timezone = Asia\/Shanghai/g&#39;</span> /etc/php.ini
+</span><span class='line'>shell&gt; sed -i <span class="s1">&#39;s/^.*post_max_size =.*$/post_max_size = 16M/g&#39;</span> /etc/php.ini
+</span><span class='line'>shell&gt; sed -i <span class="s1">&#39;s/^.*max_execution_time =.*$/max_execution_time = 300/g&#39;</span> /etc/php.ini
+</span><span class='line'>shell&gt; sed -i <span class="s1">&#39;s/^.*max_input_time =.*$/max_input_time = 300/g&#39;</span> /etc/php.ini
+</span><span class='line'>shell&gt; sed -i <span class="s1">&#39;s/^.* memory_limit =.*$/memory_limit = 128M/g&#39;</span>  /etc/php.ini
+</span><span class='line'>shell&gt; service httpd restart
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>配置服务开机启动</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; chkconfig zabbix-server on
+</span><span class='line'>shell&gt; chkconfig zabbix-agent on
+</span><span class='line'>shell&gt; chkconfig httpd on
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>访问 <a href="http://your-zabbix-server-ip/zabbix">http://your-zabbix-server-ip/zabbix</a></p>
+
+<p>默认username/password 是Admin/zabbix.</p>
+
+<ul>
+<li>如果出现错误：zabbix server is not running</li>
+</ul>
+
+
+<p><a href="https://my.oschina.net/u/1590519/blog/330357">解决办法</a>：设置SELinux 成为permissive模式  <code>shell&gt; setenforce 0</code></p>
+
+<ul>
+<li>如果出现防火墙相关问题，打开agent的端口</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>查看zabbix监听端口：
+</span><span class='line'>shell&gt; netstat -nlop <span class="p">|</span> grep zabbix
+</span><span class='line'>tcp        <span class="m">0</span>      <span class="m">0</span> 0.0.0.0:10051           0.0.0.0:*               LISTEN      23904/zabbix_server  off <span class="o">(</span>0.00/0/0<span class="o">)</span>
+</span><span class='line'>tcp6       <span class="m">0</span>      <span class="m">0</span> :::10051                :::*                    LISTEN      23904/zabbix_server  off <span class="o">(</span>0.00/0/0<span class="o">)</span>
+</span><span class='line'>打开防火墙该端口：
+</span><span class='line'>shell&gt; iptables -I INPUT -p tcp --dport <span class="m">10051</span> -m state --state NEW,ESTABLISHED -j ACCEPT
+</span><span class='line'>shell&gt; iptables -I OUTPUT -p tcp --sport <span class="m">10051</span> -m state --state ESTABLISHED -j ACCEPT
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>也可以批量修改其他端口：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; iptables-save &gt; firewalls.txt
+</span><span class='line'>shell&gt; vim firewalls.txt
+</span><span class='line'>shell&gt; iptables-restore &lt;firewalls.txt
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>或者直接关闭防火墙：<code># systemctl stop firewalld</code></p>
+
+<p>see also <a href="http://www.cnblogs.com/pixy/p/5156739.html">Linux防火墙配置(iptables, firewalld)</a></p>
+
+<h2>4.2 zabbix agent</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell&gt; sudo rpm -ivh http://repo.zabbix.com/zabbix/2.2/rhel/7/x86_64/zabbix-release-2.2-1.el7.noarch.rpm
+</span><span class='line'>shell&gt; sudo yum install zabbix-agent zabbix-sender -y
+</span><span class='line'>shell&gt; grep -Ev <span class="s1">&#39;(^$|^#)&#39;</span> /etc/zabbix/zabbix_agentd.conf  <span class="c">#修改server地址</span>
+</span><span class='line'><span class="nv">PidFile</span><span class="o">=</span>/var/run/zabbix/zabbix_agentd.pid
+</span><span class='line'><span class="nv">LogFile</span><span class="o">=</span>/var/log/zabbix/zabbix_agentd.log
+</span><span class='line'><span class="nv">LogFileSize</span><span class="o">=</span>0
+</span><span class='line'><span class="nv">Server</span><span class="o">=</span>172.16.44.5
+</span><span class='line'><span class="nv">Hostname</span><span class="o">=</span>Zabbix server fsj
+</span><span class='line'><span class="nv">Include</span><span class="o">=</span>/etc/zabbix/zabbix_agentd.d/
+</span><span class='line'>
+</span><span class='line'>shell&gt; sudo service zabbix-agent start
+</span><span class='line'>shell&gt; sudo systemctl <span class="nb">enable </span>zabbix-agent
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>5 用户管理</h1>
+
+<p><img src="http://ww1.sinaimg.cn/large/7156462egw1fb0n5yw928j218e0e0jzk.jpg" alt="user list" /></p>
+
+<p><img src="http://ww1.sinaimg.cn/large/7156462egw1fb0njs2v9ij218g0cf7b0.jpg" alt="user groups list" /></p>
+
+<p>权限管理并不是直接设置一个user对应于一个host的什么权限，而是设置user groups对应与host groups的权限。</p>
+
+<p><img src="http://ww3.sinaimg.cn/large/7156462egw1fb0nmppfp0j20vy0futd2.jpg" alt="" /></p>
+
+<p>切换到permissions选项卡</p>
+
+<p><img src="http://ww4.sinaimg.cn/large/7156462egw1fb0nnyipqzj20zh0ohgq8.jpg" alt="" /></p>
+
+<h1>6 开始监控</h1>
+
+<h2>6.1 添加Zabbix agent（局域网其他机器）以及其item</h2>
+
+<p>新建host
+<img src="https://www.zabbix.com/documentation/2.2/_media/manual/quickstart/new_host.png" alt="new host" /></p>
+
+<p>其中，最好有一个Host name项和<code>/etc/zabbix/zabbix_agentd.conf</code>中Hostname保持一致。</p>
+
+<p>如果不存在host与配置文件中的Hostname相同，那么运行之后log文件会报错<code>host xxx(Hostname值) not found</code>，但是前端host条目依然可以获取到数据。</p>
+
+<p>修改conf文件后要重启服务才能生效</p>
+
+<p>新建item
+<img src="https://www.zabbix.com/documentation/2.2/_media/manual/quickstart/new_item.png" alt="new item" /></p>
+
+<p>其中key表示要监测的的信息。
+1. 详细：<a href="https://www.zabbix.com/documentation/2.2/manual/config/items/itemtypes/zabbix_agent">https://www.zabbix.com/documentation/2.2/manual/config/items/itemtypes/zabbix_agent</a>
+2. <a href="https://www.zabbix.com/documentation/2.2/manual/appendix/items/supported_by_platform">Items supported by platform</a></p>
+
+<p>在configuration->hosts页面可看到刚刚添加的host，如果available项为绿色Z表示一切正常。</p>
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115155508338-57307903.png" alt="host list" /></p>
+
+<p>有可能出现如下错误</p>
+
+<blockquote><p>Received empty response from Zabbix Agent at [x.x.x.x]. Assuming that agent dropped connection because of access permission</p></blockquote>
+
+<p>到Monitoring -> Latest data页面查看监控到的实时数据</p>
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115155638994-755881875.png" alt="latest data" /></p>
+
+<p>点击graph可以查看cpu load的折线图。</p>
+
+<h2>6.2 触发器</h2>
+
+<p>一个触发器包括一个定义了数据阈值的<a href="https://www.zabbix.com/documentation/2.2/manual/config/triggers/expression">表达式</a>。</p>
+
+<p>格式为<code>{&lt;server&gt;:&lt;key&gt;.&lt;function&gt;(&lt;parameter&gt;)}&lt;operator&gt;&lt;constant&gt;</code>。<br/>
+其中：
+1. key: 该server定义的item
+2. function: <a href="https://www.zabbix.com/documentation/2.2/manual/appendix/triggers/functions">https://www.zabbix.com/documentation/2.2/manual/appendix/triggers/functions</a>
+3. parameter: 数字n表示n秒，#n表示最近n个值，n[m|h|d]表示n[分钟|小时|天]</p>
+
+<p>输入数据如果高于该阈值，触发器就会报警。</p>
+
+<h3>6.2.1 创建触发器</h3>
+
+<p><img src="https://www.zabbix.com/documentation/2.2/_media/manual/quickstart/new_trigger.png" alt="new trigger" /></p>
+
+<p>激活触发器 <code>shell&gt; cat /dev/urandom | md5sum</code></p>
+
+<p><img src="http://ww4.sinaimg.cn/large/7156462egw1fazje03tolj217q0itgs1.jpg" alt="latest data graph of cpu load" /></p>
+
+<p><img src="http://ww4.sinaimg.cn/large/7156462egw1fazjga5c24j218b0iegsq.jpg" alt="monitoring-triggers" /></p>
+
+<p>更多触发器示例：</p>
+
+<ol>
+<li><code>{www.zabbix.com:system.cpu.load[all,avg1].last()}&gt;5</code></li>
+<li><code>{www.zabbix.com:system.cpu.load[all,avg1].last()}&gt;5|{www.zabbix.com:system.cpu.load[all,avg1].min(10m)}&gt;2</code></li>
+<li><code>{www.zabbix.com:vfs.file.cksum[/etc/passwd].diff()}=1</code></li>
+</ol>
+
+
+<h3>6.2.2 通知</h3>
+
+<p>Administration -> Media type 设置 email（需要有email软件支持）</p>
+
+<p><img src="https://www.zabbix.com/documentation/2.2/_media/manual/quickstart/1.9.7_media_type_email.png" alt="" /></p>
+
+<p>新建action</p>
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115155906385-1184761700.png" alt="" /></p>
+
+<p>查看发送情况</p>
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115160022431-741622625.png" alt="administration audit" /></p>
+
+<p>这里没有设email相关，所以发送失败</p>
+
+<h1>7 使用模版</h1>
+
+<p>点击host，切换到templates选项卡可以关联想要的模版。</p>
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115160241322-10249453.png" alt="" /></p>
+
+<p>我们也可以通过 Configuration → Templates 可以创建空模版。然后把现有的item、trigger等拷贝到该模版，方便以后批量应用。
+<img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115160503838-460061465.png" alt="" /></p>
+
+<h1>References</h1>
+
+<ol>
+<li><a href="https://www.zabbix.com/documentation/2.2/manual">https://www.zabbix.com/documentation/2.2/manual</a></li>
+<li><a href="http://zabbix-manual-in-chinese.readthedocs.io/en/latest/index.html">http://zabbix-manual-in-chinese.readthedocs.io/en/latest/index.html</a></li>
+<li><a href="http://www.ttlsa.com/zabbix/zabbix-section-3-of-chapter-1/">http://www.ttlsa.com/zabbix/zabbix-section-3-of-chapter-1/</a></li>
+<li><a href="https://www.zabbix.com/documentation/2.2/manual/quickstart">https://www.zabbix.com/documentation/2.2/manual/quickstart</a></li>
+<li><a href="http://www.ttlsa.com/zabbix/follow-ttlsa-to-study-zabbix/">跟着ttlsa一起学zabbix监控</a></li>
+<li><a href="http://www.cnblogs.com/Brandyn/p/5443491.html">监控 Zabbix</a></li>
+<li><a href="http://zabbix.org.cn">http://zabbix.org.cn</a></li>
+</ol>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+
+
+  <span class="byline author vcard">Authored by <span class="fn">
+  
+    lawlietfans
+  
+  </span></span>
+
+
+      
+
+
+
+
+<time class='entry-date' datetime='2017-01-15T20:00:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>8:00 pm</span></time>
+      
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/zabbix/'>zabbix</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/12/27/how-to-setup-ST3-dev-env/" title="Previous Post: Sublime Text3下快速搭建开发环境">&laquo; Sublime Text3下快速搭建开发环境</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2017/01/15/howto-use-fpmmm-and-zabbix-monitoring-database-state/" title="Next Post: using-fpmmm+zabbix-monitoring-database-state">using-fpmmm+zabbix-monitoring-database-state &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+   <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="/blog/2017/01/15/zabbix-quick-start" data-title="zabbix-quick-start" data-url="http://lawlietfans.coding.me/blog/2017/01/15/zabbix-quick-start/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"lawlietfans-coding"};
+    (function() {
+
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+ </script>
+ <!-- 多说公共JS代码 end -->
+
+  </section>
+<!--
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+-->
+
+<!--
+
+-->
+</div>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2017 - lawlietfans -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a> | Themed with <a href="https://github.com/lucaslew/whitespace">Whitespace</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+
+</body>
+</html>
