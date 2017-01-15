@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Fpmmm | 畑鹿驚 - 博客]]></title>
   <link href="http://lawlietfans.coding.me/blog/categories/fpmmm/atom.xml" rel="self"/>
   <link href="http://lawlietfans.coding.me/"/>
-  <updated>2017-01-15T16:51:38+08:00</updated>
+  <updated>2017-01-15T16:59:37+08:00</updated>
   <id>http://lawlietfans.coding.me/</id>
   <author>
     <name><![CDATA[lawlietfans]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Using-fpmmm+zabbix-monitoring-database-state]]></title>
+    <title type="html"><![CDATA[如何通过fpmmm和zabbix来监控客户机上MariaDB数据库运行情况]]></title>
     <link href="http://lawlietfans.coding.me/blog/2017/01/15/howto-use-fpmmm-and-zabbix-monitoring-database-state/"/>
     <updated>2017-01-15T21:00:00+08:00</updated>
     <id>http://lawlietfans.coding.me/blog/2017/01/15/howto-use-fpmmm-and-zabbix-monitoring-database-state</id>
