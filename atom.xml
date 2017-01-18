@@ -4,7 +4,7 @@
   <title><![CDATA[畑鹿驚 - 博客]]></title>
   <link href="http://lawlietfans.coding.me/atom.xml" rel="self"/>
   <link href="http://lawlietfans.coding.me/"/>
-  <updated>2017-01-16T19:59:04+08:00</updated>
+  <updated>2017-01-19T00:11:00+08:00</updated>
   <id>http://lawlietfans.coding.me/</id>
   <author>
     <name><![CDATA[lawlietfans]]></name>
@@ -12,6 +12,596 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Apache Thrift概念以及快速入门]]></title>
+    <link href="http://lawlietfans.coding.me/blog/2017/01/18/thrift-quick-start/"/>
+    <updated>2017-01-18T20:00:00+08:00</updated>
+    <id>http://lawlietfans.coding.me/blog/2017/01/18/thrift-quick-start</id>
+    <content type="html"><![CDATA[<p>本文简要介绍了thrift的背景、相关概念以及安装流程。并给出了C++以及python版本的入门例子。其中背景概念部分翻译自[1]。</p>
+
+<!--more-->
+
+
+<h1>1 Krzysztof Rakowski的Apache Thrift介绍</h1>
+
+<h2>1.1 部分历史与背景</h2>
+
+<p>Thrift由facebook在2017年提出。facebook的公司文化就是不限制你选择任何开发语言，用最佳方案解决实际问题。毫无疑问，公司内部许多应用程序都是用不同语言编写的。这也是为什么facebook需要一种工具，是的这些应用程序能够相互通信。然后他们花了一些精力寻找这样的工具，可惜并没找到合适的。<a href="https://thrift.apache.org/static/files/thrift-20070401.pdf">facebook发布的白皮书</a>也提到了他们曾经考察的工具，以及Thrift框架的设计思路。</p>
+
+<p>当然啦，牛逼如facebook的程序员克服了一些挑战，自己开发了该需求的解决方案——Thrift就是这样诞生的。不久之后，他们开源了Thrift，并且托管到Apache基金会，后者开始负责Thrift的开发。现在Thrift不仅仅被用在facebook（公司内部应用间通信的主要工具），而且被其他许多公司使用。（包括Evernote、Twitter和Netflix等知名公司）。facebook的工程师仍然会在fork版本<a href="https://github.com/facebook/fbthrift">FBThrift</a>上继续开发。并且有希望与Apache Thrift整合。</p>
+
+<h2>1.2 Apache Thrift究竟是什么</h2>
+
+<p>我们想象一下这种情形：你有许多用不同语言开发的应用程序，比如一种很常见的情况就是公司内部独立的开发小组各自开发了一些应用程序，用来执行一些不同的内部任务。那怎么让这些应用程序相互通信呢？当然啦，你可以添加一些REST API。但是在许多情况下——尤其是你要传输二进制数据——这种方案并不能满足性能和可靠性要求。</p>
+
+<h2>1.3 Thrift如何工作</h2>
+
+<p>首先，让我们从Apache Thrift开发者的角度来看看。Thrift框架的主要概念是<strong>服务</strong>，服务和面向对象编程语言中的类很相似。每个服务中都包含方法，也是OOP中的类似概念。Thrift还实现了需要数据类型。这些数据类型在每种编程语言中都有具体对应的类型，最简单的例子比如Thrift中的int，在所有语言中都会映射成整型。但是复杂点的比如set，在php中会映射成array，在java中会映射成HashSet。编写<strong>服务</strong>的文本文件也被称为Thrift文档（后缀是<code>.thrift</code>），包括服务在内，文档中的所有代码都是接口定义语言(Interface Description Language ,IDL)，如果要了解详细语法，请参考官方文档[2]。（注：其实IDL语法很简单，源码中有一份自解释的Thrift文件：<a href="https://github.com/apache/thrift/blob/master/tutorial/tutorial.thrift">tutorial.thrift</a>）</p>
+
+<p>接着，从这个Thrift文件——通过Apache Thrift编译器——你可以生成server和client的stub。这些自动生成的代码被称为Apache Thrift库，然后你借助库，按照你的需求，实现指定语言的server和client——过程很像代码填空，填好自己相关部分即可。（比如对象创建、方法调用等语句），这样就实现了不同应用程序相互通信。你生成的server和client代码嵌入到你的应用程序中。过程如下所示：</p>
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170119232058453-1256446163.png" alt="" /></p>
+
+<p>看实例之前，让我们大致看下Apache Thrift的架构。如下图所示：</p>
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170119232118453-179236798.png" alt="" /></p>
+
+<p>传输层的功能是从你使用的介质（一般是socket）中读写负载。协议层一般和传输层解耦，负责数据的编码和解析，方便数据传输。常用协议包括：binary，compact（Thrift独有）以及JSON。至于处理器层，这里说的很模糊，主要是把用户指定的输入输出协议作为参数，然后从输入读取数据，按照用户规则进行处理，最后向输出写入数据[3]，如下图所示：</p>
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170119232159531-785418038.png" alt="" /></p>
+
+<p>在server和client代码中，这三层组合在一起。如果你想两个应用程序相互通信，那么server和client要使用相同的传输层和协议层集合，这样才能正确编码和解析数据。第三节有C++以及python版本的入门例子。</p>
+
+<h1>2 安装</h1>
+
+<p>1、<a href="http://thrift.apache.org/docs/install/">安装依赖项</a>，官方给出了不同系统下的依赖项安装步骤。</p>
+
+<p>2、编译源代码，安装</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="c"># github mirror: https://github.com/apache/thrift</span>
+</span><span class='line'>git clone https://git-wip-us.apache.org/repos/asf/thrift.git
+</span><span class='line'><span class="nb">cd </span>thrift
+</span><span class='line'>./bootstrap.sh
+</span><span class='line'>
+</span><span class='line'><span class="c"># 禁用lua语言，查看更多参数：./configure --help</span>
+</span><span class='line'>./configure --with-lua<span class="o">=</span>no
+</span><span class='line'>
+</span><span class='line'><span class="c"># 编译</span>
+</span><span class='line'>make
+</span><span class='line'><span class="c"># 安装</span>
+</span><span class='line'>sudo make install
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>configure这一步结束会在terminal输出对不同语言的支持信息，检查一下是否满足自己要求。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>Building Plugin Support ...... : yes
+</span><span class='line'>Building C++ Library ......... : yes
+</span><span class='line'>Building C <span class="o">(</span>GLib<span class="o">)</span> Library .... : no
+</span><span class='line'>Building Java Library ........ : no
+</span><span class='line'>Building C# Library .......... : no
+</span><span class='line'>Building .NET Core Library ... : no
+</span><span class='line'>Building Python Library ...... : yes
+</span><span class='line'>Building Ruby Library ........ : no
+</span><span class='line'>Building Haxe Library ........ : no
+</span><span class='line'>Building Haskell Library ..... : no
+</span><span class='line'>Building Perl Library ........ : no
+</span><span class='line'>Building PHP Library ......... : yes
+</span><span class='line'>Building Dart Library ........ : no
+</span><span class='line'>Building Erlang Library ...... : no
+</span><span class='line'>Building Go Library .......... : no
+</span><span class='line'>Building D Library ........... : no
+</span><span class='line'>Building NodeJS Library ...... : no
+</span><span class='line'>Building Lua Library ......... : no
+</span><span class='line'>
+</span><span class='line'>C++ Library:
+</span><span class='line'>   Build TZlibTransport ...... : yes
+</span><span class='line'>   Build TNonblockingServer .. : yes
+</span><span class='line'>   Build TQTcpServer <span class="o">(</span>Qt4<span class="o">)</span> .... : no
+</span><span class='line'>   Build TQTcpServer <span class="o">(</span>Qt5<span class="o">)</span> .... : no
+</span><span class='line'>
+</span><span class='line'>Python Library:
+</span><span class='line'>   Using Python .............. : /usr/bin/python
+</span><span class='line'>   Using Python3 ............. : /usr/local/bin/python3
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果make这一步出现缺少.a文件的问题：</p>
+
+<p><code>g++: error: /usr/lib64/libboost_unit_test_framework.a: No such file or directory</code></p>
+
+<p>首先检查上一步的依赖项有没有全部安装，没问题的话可以看看<code>/usr/local/lib/</code>下有没有该文件，再拷贝到make过程中所寻找的路径下。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>ls /usr/local/lib/libboost_unit_test_framework.*
+</span><span class='line'>/usr/local/lib/libboost_unit_test_framework.a
+</span><span class='line'>/usr/local/lib/libboost_unit_test_framework.so
+</span><span class='line'>/usr/local/lib/libboost_unit_test_framework.so.1.53.0
+</span><span class='line'>
+</span><span class='line'><span class="nv">$ </span>ls /usr/lib64/libboost_unit_test_framework*
+</span><span class='line'>/usr/lib64/libboost_unit_test_framework-mt.so         /usr/lib64/libboost_unit_test_framework.so
+</span><span class='line'>/usr/lib64/libboost_unit_test_framework-mt.so.1.53.0  /usr/lib64/libboost_unit_test_framework.so.1.53.0
+</span><span class='line'>
+</span><span class='line'><span class="nv">$ </span>make -n <span class="p">|</span> grep libboost_unit_test_framework
+</span><span class='line'>/bin/sh ../../../libtool  --tag<span class="o">=</span>CXX   --mode<span class="o">=</span>link g++ -Wall -Wextra -pedantic -g -O2 -std<span class="o">=</span>c++11 -L/usr/lib64  -o processor_test processor/ProcessorTest.o processor/EventLog.o processor/ServerThread.o libprocessortest.la ../../../lib/cpp/libthrift.la ../../../lib/cpp/libthriftnb.la /usr/lib64/libboost_unit_test_framework.a -L/usr/lib64 -levent -lrt -lpthread
+</span><span class='line'>
+</span><span class='line'><span class="nv">$ </span>sudo cp /usr/local/lib/libboost_unit_test_framework.a /usr/lib64/
+</span><span class='line'><span class="nv">$ </span>make
+</span><span class='line'>no error.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>3、验证</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>thrift -version
+</span><span class='line'>Thrift version 1.0.0-dev
+</span><span class='line'><span class="nv">$ </span>which thrift
+</span><span class='line'>/usr/local/bin/thrift
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>3 入门例子</h1>
+
+<p>编写一个简单的thrift文件，定义相乘函数</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>ls
+</span><span class='line'>multiplication.thrift
+</span><span class='line'><span class="nv">$ </span>cat multiplication.thrift
+</span><span class='line'>namespace py tutorial
+</span><span class='line'>
+</span><span class='line'>service MultiplicationService
+</span><span class='line'><span class="o">{</span>
+</span><span class='line'>    i32 multiply<span class="o">(</span>1:i32 n1, 2:i32 n2<span class="o">)</span>,
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>3.1 C++ server和client</h2>
+
+<p>编译生成c++代码</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>thrift --gen cpp multiplication.thrift
+</span><span class='line'>
+</span><span class='line'><span class="nv">$ </span>ls -R
+</span><span class='line'>.:
+</span><span class='line'>gen-cpp  multiplication.thrift
+</span><span class='line'>
+</span><span class='line'>./gen-cpp:
+</span><span class='line'>multiplication_constants.cpp    MultiplicationService.h    multiplication_types.h
+</span><span class='line'>multiplication_constants.h      MultiplicationService_server.skeleton.cpp
+</span><span class='line'>MultiplicationService.cpp       multiplication_types.cpp
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>接下来修改官方模版skeleton.cpp[4]</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>mv MultiplicationService_server.skeleton.cpp server.cpp
+</span><span class='line'>只需要修改server.cpp中int32_t multiply<span class="o">(</span>const int32_t n1, const int32_t n2<span class="o">)</span>函数
+</span><span class='line'><span class="nv">$ </span>cat server.cpp
+</span><span class='line'>...
+</span><span class='line'>  int32_t multiply<span class="o">(</span>const int32_t n1, const int32_t n2<span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    // Your implementation goes here
+</span><span class='line'>    <span class="k">return</span> n1*n2<span class="p">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>...
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后编写client.cpp</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='cpp'><span class='line'><span class="cp">#include &quot;MultiplicationService.h&quot;</span>
+</span><span class='line'><span class="cp">#include &lt;thrift/transport/TSocket.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;thrift/transport/TBufferTransports.h&gt;</span>
+</span><span class='line'><span class="cp">#include &lt;thrift/protocol/TBinaryProtocol.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cp">#include &lt;iostream&gt;</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">apache</span><span class="o">::</span><span class="n">thrift</span><span class="p">;</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">apache</span><span class="o">::</span><span class="n">thrift</span><span class="o">::</span><span class="n">protocol</span><span class="p">;</span>
+</span><span class='line'><span class="k">using</span> <span class="k">namespace</span> <span class="n">apache</span><span class="o">::</span><span class="n">thrift</span><span class="o">::</span><span class="n">transport</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">boost</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">TSocket</span><span class="o">&gt;</span> <span class="n">socket</span><span class="p">(</span><span class="k">new</span> <span class="n">TSocket</span><span class="p">(</span><span class="s">&quot;localhost&quot;</span><span class="p">,</span> <span class="mi">9090</span><span class="p">));</span>
+</span><span class='line'>  <span class="n">boost</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">TTransport</span><span class="o">&gt;</span> <span class="n">transport</span><span class="p">(</span><span class="k">new</span> <span class="n">TBufferedTransport</span><span class="p">(</span><span class="n">socket</span><span class="p">));</span>
+</span><span class='line'>  <span class="n">boost</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">TProtocol</span><span class="o">&gt;</span> <span class="n">protocol</span><span class="p">(</span><span class="k">new</span> <span class="n">TBinaryProtocol</span><span class="p">(</span><span class="n">transport</span><span class="p">));</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">res</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">MultiplicationServiceClient</span> <span class="n">client</span><span class="p">(</span><span class="n">protocol</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">transport</span><span class="o">-&gt;</span><span class="n">open</span><span class="p">();</span>
+</span><span class='line'>  <span class="n">res</span> <span class="o">=</span> <span class="n">client</span><span class="p">.</span><span class="n">multiply</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;res &quot;</span><span class="o">&lt;&lt;</span><span class="n">res</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">transport</span><span class="o">-&gt;</span><span class="n">close</span><span class="p">();</span>
+</span><span class='line'>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>编译源码</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>g++ -c MultiplicationService.cpp
+</span><span class='line'><span class="nv">$ </span>g++ -c multiplication_constants.cpp multiplication_types.cpp server.cpp
+</span><span class='line'><span class="nv">$ </span>g++ -lthrift *.o -o server.exe
+</span><span class='line'><span class="nv">$ </span>g++ -c MultiplicationService.cpp multiplication_constants.cpp multiplication_types.cpp client.cpp
+</span><span class='line'><span class="nv">$ </span>g++ -lthrift *.o -o client.exe
+</span><span class='line'>
+</span><span class='line'><span class="nv">$ </span>ls -R
+</span><span class='line'>.:
+</span><span class='line'>gen-cpp  multiplication.thrift
+</span><span class='line'>
+</span><span class='line'>./gen-cpp:
+</span><span class='line'>client.cpp  multiplication_constants.cpp  MultiplicationService.cpp  multiplication_types.cpp  server.cpp
+</span><span class='line'>client.exe  multiplication_constants.h    MultiplicationService.h    multiplication_types.h    server.exe
+</span><span class='line'>client.o    multiplication_constants.o    MultiplicationService.o    multiplication_types.o    server.o
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>运行</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell 1&gt; ./server.exe
+</span><span class='line'>shell 2&gt; ./client.exe
+</span><span class='line'>res 100
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果运行server.exe出现找不到共享库的错误，<a href="http://www.cnblogs.com/davidyang2415/archive/2012/03/28/2421158.html">解决办法</a>如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>./server
+</span><span class='line'>./server: error <span class="k">while</span> loading shared libraries: libthrift-1.0.0-dev.so: cannot open shared object file: No such file or directory
+</span><span class='line'><span class="nv">$ </span>sudo find / -name <span class="s2">&quot;libthrift*so&quot;</span> <span class="c">#where is your libthrift</span>
+</span><span class='line'>/usr/local/lib/libthrift-1.0.0-dev.so
+</span><span class='line'>/usr/local/lib/libthrift.so
+</span><span class='line'>...
+</span><span class='line'><span class="nv">$ </span><span class="nb">echo</span> <span class="s2">&quot;export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/:/usr/lib/&quot;</span> &gt;&gt; ~/.bashrc  <span class="c">#set env var</span>
+</span><span class='line'><span class="nv">$ </span>. ~/.bashrc  <span class="c">#reload</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>3.2 python server和client</h2>
+
+<p>生成python代码</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>thrift --gen py multiplication.thrift
+</span><span class='line'><span class="nv">$ </span>ls -R gen-py
+</span><span class='line'>./gen-py:
+</span><span class='line'>__init__.py  tutorial
+</span><span class='line'>
+</span><span class='line'>./gen-py/tutorial:
+</span><span class='line'>constants.py  __init__.pyc              MultiplicationService.pyc     ttypes.py
+</span><span class='line'>__init__.py   MultiplicationService.py  MultiplicationService-remote  ttypes.pyc
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>创建server.py和client.py</p>
+
+<p>server.py</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='py'><span class='line'><span class="kn">import</span> <span class="nn">glob</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">sys</span>
+</span><span class='line'><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;gen-py&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">&#39;../../lib/py/build/lib*&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">tutorial</span> <span class="kn">import</span> <span class="n">MultiplicationService</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">thrift.transport</span> <span class="kn">import</span> <span class="n">TSocket</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">thrift.transport</span> <span class="kn">import</span> <span class="n">TTransport</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">thrift.protocol</span> <span class="kn">import</span> <span class="n">TBinaryProtocol</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">thrift.server</span> <span class="kn">import</span> <span class="n">TServer</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">MultiplicationServiceHandler</span><span class="p">(</span><span class="n">MultiplicationService</span><span class="o">.</span><span class="n">Iface</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">multiply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">):</span>
+</span><span class='line'>        <span class="k">print</span><span class="p">(</span><span class="s">&#39;multiply(</span><span class="si">%d</span><span class="s">,</span><span class="si">%d</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n1</span><span class="p">,</span><span class="n">n2</span><span class="p">))</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">n1</span><span class="o">*</span><span class="n">n2</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+</span><span class='line'>    <span class="n">handler</span> <span class="o">=</span> <span class="n">MultiplicationServiceHandler</span><span class="p">()</span>
+</span><span class='line'>    <span class="n">processor</span> <span class="o">=</span> <span class="n">MultiplicationService</span><span class="o">.</span><span class="n">Processor</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">transport</span> <span class="o">=</span> <span class="n">TSocket</span><span class="o">.</span><span class="n">TServerSocket</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">9090</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">tfactory</span> <span class="o">=</span> <span class="n">TTransport</span><span class="o">.</span><span class="n">TBufferedTransportFactory</span><span class="p">()</span>
+</span><span class='line'>    <span class="n">pfactory</span> <span class="o">=</span> <span class="n">TBinaryProtocol</span><span class="o">.</span><span class="n">TBinaryProtocolFactory</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">server</span> <span class="o">=</span> <span class="n">TServer</span><span class="o">.</span><span class="n">TSimpleServer</span><span class="p">(</span><span class="n">processor</span><span class="p">,</span> <span class="n">transport</span><span class="p">,</span> <span class="n">tfactory</span><span class="p">,</span> <span class="n">pfactory</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c"># You could do one of these for a multithreaded server</span>
+</span><span class='line'>    <span class="c"># server = TServer.TThreadedServer(</span>
+</span><span class='line'>    <span class="c">#     processor, transport, tfactory, pfactory)</span>
+</span><span class='line'>    <span class="c"># server = TServer.TThreadPoolServer(</span>
+</span><span class='line'>    <span class="c">#     processor, transport, tfactory, pfactory)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">print</span><span class="p">(</span><span class="s">&#39;Starting the server...&#39;</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">server</span><span class="o">.</span><span class="n">serve</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>client.py</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='py'><span class='line'><span class="kn">import</span> <span class="nn">sys</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">glob</span>
+</span><span class='line'><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;gen-py&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s">&#39;../../lib/py/build/lib*&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">from</span> <span class="nn">tutorial</span> <span class="kn">import</span> <span class="n">MultiplicationService</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">thrift</span> <span class="kn">import</span> <span class="n">Thrift</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">thrift.transport</span> <span class="kn">import</span> <span class="n">TSocket</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">thrift.transport</span> <span class="kn">import</span> <span class="n">TTransport</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">thrift.protocol</span> <span class="kn">import</span> <span class="n">TBinaryProtocol</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+</span><span class='line'>    <span class="n">transport</span> <span class="o">=</span> <span class="n">TSocket</span><span class="o">.</span><span class="n">TSocket</span><span class="p">(</span><span class="s">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">9090</span><span class="p">)</span>
+</span><span class='line'>    <span class="c"># Buffering is critical. Raw sockets are very slow</span>
+</span><span class='line'>    <span class="n">transport</span> <span class="o">=</span> <span class="n">TTransport</span><span class="o">.</span><span class="n">TBufferedTransport</span><span class="p">(</span><span class="n">transport</span><span class="p">)</span>
+</span><span class='line'>    <span class="c"># Wrap in a protocol</span>
+</span><span class='line'>    <span class="n">protocol</span> <span class="o">=</span> <span class="n">TBinaryProtocol</span><span class="o">.</span><span class="n">TBinaryProtocol</span><span class="p">(</span><span class="n">transport</span><span class="p">)</span>
+</span><span class='line'>    <span class="c"># Create a client to use the protocol encoder</span>
+</span><span class='line'>    <span class="n">client</span> <span class="o">=</span> <span class="n">MultiplicationService</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">protocol</span><span class="p">)</span>
+</span><span class='line'>    <span class="c"># Connect!</span>
+</span><span class='line'>    <span class="n">transport</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+</span><span class='line'>    <span class="k">print</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+</span><span class='line'>    <span class="c"># Close!</span>
+</span><span class='line'>    <span class="n">transport</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">try</span><span class="p">:</span>
+</span><span class='line'>        <span class="n">main</span><span class="p">()</span>
+</span><span class='line'>    <span class="k">except</span> <span class="n">Thrift</span><span class="o">.</span><span class="n">TException</span> <span class="k">as</span> <span class="n">tx</span><span class="p">:</span>
+</span><span class='line'>        <span class="k">print</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">tx</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>运行</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nv">$ </span>chmod a+x server.py
+</span><span class='line'><span class="nv">$ </span>chmod a+x client.py
+</span><span class='line'>
+</span><span class='line'>shell 1&gt; ./server.py
+</span><span class='line'>Starting the server...
+</span><span class='line'>multiply<span class="o">(</span>10,10<span class="o">)</span>
+</span><span class='line'>shell 2&gt; ./client.py
+</span><span class='line'>100
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>python client使用C++ server提供的服务</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>shell 1&gt; ./server.exe
+</span><span class='line'>shell 2&gt; ./client.py
+</span><span class='line'>100
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>References</h1>
+
+<ol>
+<li><a href="http://www.thrift.pl/">http://www.thrift.pl/</a></li>
+<li><a href="http://thrift.apache.org/">http://thrift.apache.org/</a></li>
+<li><a href="http://thrift-tutorial.readthedocs.io">http://thrift-tutorial.readthedocs.io</a></li>
+<li><a href="http://roclinux.cn/?p=3316">http://roclinux.cn/?p=3316</a></li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[如何通过fpmmm和zabbix来监控客户机上MariaDB数据库运行情况]]></title>
