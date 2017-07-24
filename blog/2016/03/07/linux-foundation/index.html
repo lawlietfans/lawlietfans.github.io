@@ -1,0 +1,677 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Linux服务器配置和管理：一般管理 - 畑鹿驚 - 博客</title>
+  <meta name="author" content="lawlietfans">
+
+  
+  <meta name="description" content="原文地址：http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/ OUTLINE 1 Step by step
+2 如何编辑文件？——vim编辑器入门
+3 用户管理
+4 文件/目录权限管理
+5 ref 上一篇提到， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="畑鹿驚 - 博客" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//libs.baidu.com/jquery/1.7.2/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--- MathJax Configuration -->
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+</head>
+
+<body   class="collapse-sidebar sidebar-footer" >
+  <header role="banner"><hgroup>
+  <h1><a href="/">畑鹿驚 - 博客</a></h1>
+  
+    <h2>Oh My God, They killed Kenny!!!</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscribe" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS" target="_blank"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25" height="25" viewbox="0 0 100 100"><path class="social" d="M 13.310204,73.332654 C 5.967347,73.332654 0,79.322448 0,86.621428 c 0,7.338776 5.967347,13.262246 13.310204,13.262246 7.370408,0 13.328572,-5.92245 13.328572,-13.262246 0,-7.29898 -5.958164,-13.288774 -13.328572,-13.288774 z M 0.01530612,33.978572 V 53.143878 C 12.493878,53.143878 24.229592,58.02347 33.068368,66.865306 41.894898,75.685714 46.767346,87.47449 46.767346,100 h 19.25 C 66.017346,63.592858 36.4,33.979592 0.01530612,33.978572 l 0,0 z M 0.03877552,0 V 19.17449 C 44.54796,19.17551 80.77551,55.437756 80.77551,100 H 100 C 100,44.87653 55.15102,0 0.03877552,0 z"></path></svg></a></li>
+  
+</ul>
+  
+  
+  
+  
+  
+<ul class="subscribe">
+  <li><a href="https://github.com/lawlietfans" rel="subscribe-github" title="@lawlietfans on GitHub" target="_blank"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25" height="25" viewbox="0 0 100 100"><path class="social" d="M 50,0 C 22.385714,0 0,22.385714 0,50 0,77.614286 22.385714,100 50,100 77.614286,100 100,77.614286 100,50 100,22.385714 77.614286,0 50,0 z m 29.692858,79.692858 c -3.859184,3.859182 -8.351022,6.887754 -13.35,9.00306 -1.27041,0.536736 -2.560204,1.009184 -3.867348,1.415306 v -7.493878 c 0,-3.938774 -1.35102,-6.835714 -4.053062,-8.690816 1.692858,-0.163264 3.24694,-0.390816 4.663266,-0.683672 1.416326,-0.292858 2.913266,-0.716328 4.491838,-1.27041 1.57857,-0.55408 2.994896,-1.213264 4.247958,-1.97755 1.253062,-0.765306 2.458164,-1.758164 3.613266,-2.978572 1.155102,-1.220408 2.12449,-2.604082 2.905102,-4.15 0.780612,-1.545918 1.4,-3.40204 1.855102,-5.566326 0.455102,-2.164286 0.683674,-4.54898 0.683674,-7.153062 0,-5.045918 -1.643878,-9.341836 -4.931634,-12.890816 C 77.44796,33.35 77.285714,29.10204 75.463266,24.512244 l -1.22143,-0.145918 c -0.845918,-0.09796 -2.368366,0.260204 -4.565306,1.07449 -2.196938,0.814286 -4.663264,2.14796 -7.396938,4.004082 -3.87449,-1.07449 -7.893878,-1.611224 -12.061224,-1.611224 -4.19898,0 -8.203062,0.536734 -12.012246,1.611224 -1.72449,-1.17245 -3.361224,-2.139796 -4.907142,-2.905102 C 31.753062,25.77449 30.516326,25.254082 29.587756,24.97653 28.660204,24.7 27.79796,24.528572 27,24.463266 c -0.79796,-0.0653 -1.310204,-0.08062 -1.537756,-0.04898 -0.22755,0.03164 -0.390816,0.0653 -0.487754,0.09796 -1.82347,4.62245 -1.985714,8.87143 -0.487756,12.743878 -3.287754,3.54796 -4.931632,7.844898 -4.931632,12.890816 0,2.604082 0.227552,4.988776 0.683674,7.153062 0.456122,2.164286 1.07449,4.020408 1.855102,5.566326 0.780612,1.545918 1.75,2.929592 2.905102,4.15 1.155102,1.220408 2.360204,2.213266 3.613264,2.978572 1.253062,0.766326 2.669388,1.42449 4.24796,1.97755 1.578572,0.554082 3.07551,0.976532 4.491836,1.27041 1.416328,0.292856 2.970408,0.521428 4.663266,0.683672 -2.669388,1.82347 -4.004082,4.720408 -4.004082,8.690816 v 7.639796 C 36.536734,89.818368 35.083674,89.3 33.656122,88.695918 c -4.99898,-2.115306 -9.490816,-5.143878 -13.35,-9.00306 -3.859184,-3.859184 -6.887754,-8.351022 -9.00306,-13.35 C 9.1163263,61.171428 8.0071428,55.67347 8.0071428,50 c 0,-5.67347 1.1091835,-11.171428 3.2969392,-16.342858 2.115306,-4.998978 5.143878,-9.490816 9.00306,-13.35 3.859184,-3.859182 8.351022,-6.887754 13.35,-9.00306 C 38.828572,9.1163266 44.32653,8.0071428 50,8.0071428 c 5.67347,0 11.171428,1.1091838 16.342858,3.2969392 5,2.115306 9.490816,5.143878 13.35,9.00306 3.859182,3.859184 6.887754,8.351022 9.00306,13.35 2.186736,5.17245 3.295918,10.67041 3.295918,16.342858 0,5.672448 -1.109182,11.171428 -3.296938,16.342858 -2.115306,4.998978 -5.143878,9.490816 -9.00204,13.35 l 0,0 z"></path></svg></a></li>
+</ul>
+  
+  
+  
+  
+  
+  
+  
+  
+    
+      <form action="https://www.baidu.com/search" method="get">
+        <fieldset role="search">
+          <input type="hidden" name="sitesearch" value="lawlietfans.coding.me" />
+    
+          <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+        </fieldset>
+      </form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/category">Category</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Linux服务器配置和管理：一般管理</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-03-07T20:00:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>8:00 pm</span></time>
+        
+	
+         | <a href="#comments">Comments</a>
+        
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><blockquote><p>原文地址：<a href="http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/">http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/</a></p></blockquote>
+
+<!-- more -->
+
+
+<p>OUTLINE</p>
+
+<ul>
+<li>1 Step by step</li>
+<li>2 如何编辑文件？——vim编辑器入门</li>
+<li>3 用户管理</li>
+<li>4 文件/目录权限管理</li>
+<li>5 ref</li>
+</ul>
+
+
+<p><a href="http://lawlietfans.coding.me/blog/2016/02/29/introduction-and-centos67-install/">上一篇</a>提到，Linux发行版就是把系统内核、附带的工具程序以及应用软件包等打包在一起，组成的一个集合体或者套件。而CentOS是其中一种发行版。
+这是Linux操作系统的结构。</p>
+
+<p><img src="http://7xo0zf.com1.z0.glb.clouddn.com/16-3-26/78979443.jpg" alt="" /></p>
+
+<p>其结构可以用kernel、shell和utility三个不同层次的同心圆来表示。其中kernel控制着系统运行的各个方面，影响着一个系统的整体性能
+我们平时在Linux的使用中也大多是和shell、工具（utility）打交道。有了这些工具，程序员在shell命令行下几乎可以完成所有想做的工作，也正因为如此，Linux比Windows更加适合远程管理，因为后者的远程操作一般在GUI下完成，这无疑影响了服务器端的性能。</p>
+
+<p>Linux下的工具是非常丰富的，任何一个程序员都可以共享自己做的小工具。如果我们想要掌握这些工具的使用。最好是系统看书比如《鸟哥的私房菜》。不想看书的话，搜到的有些资料内容比较零散，有的可能像百科一样，太过于全面[1]。这里试图从初学者用的角度来了解、演示一些常用管理工具。</p>
+
+<h1>Step by step</h1>
+
+<ul>
+<li><p>1 xshell连上CentOS之后，如何关机重启呢？如何安装新软件？</p>
+
+<ul>
+<li><code>$ sudo shutdown -h</code> 或<code>halt</code></li>
+<li>重启系统：<code>$ sudo reboot</code></li>
+<li>安装git: <code>$ sudo yum install git</code></li>
+</ul>
+</li>
+<li><p>2 查看当前目录的信息</p></li>
+</ul>
+
+
+<p>ls（list）命令可用来显示目录的内容。配合参 数的使用，能以不同的方式显示目录内容。[4] <br/>
+格式：ls [参数]  [目录名或文件名]</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">ls</span>
+</span><span class='line'><span class="n">a</span>  <span class="n">b</span>  <span class="n">c</span>  <span class="n">d</span>  <span class="n">shit</span><span class="p">.</span><span class="n">c</span>
+</span><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">ll</span>
+</span><span class='line'><span class="n">total</span> <span class="mi">0</span>
+</span><span class='line'><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">fsj</span> <span class="n">fsj</span> <span class="mi">0</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">14</span><span class="o">:</span><span class="mo">07</span> <span class="n">a</span>
+</span><span class='line'><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">fsj</span> <span class="n">fsj</span> <span class="mi">0</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">14</span><span class="o">:</span><span class="mo">07</span> <span class="n">b</span>
+</span><span class='line'><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">fsj</span> <span class="n">fsj</span> <span class="mi">0</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">14</span><span class="o">:</span><span class="mo">07</span> <span class="n">c</span>
+</span><span class='line'><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">fsj</span> <span class="n">fsj</span> <span class="mi">0</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">14</span><span class="o">:</span><span class="mo">07</span> <span class="n">d</span>
+</span><span class='line'><span class="o">-</span><span class="n">rwxr</span><span class="o">--</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">fsj</span> <span class="n">fsj</span> <span class="mi">0</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">13</span><span class="o">:</span><span class="mi">10</span> <span class="n">shit</span><span class="p">.</span><span class="n">c</span>
+</span><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">ll</span> <span class="o">-</span><span class="n">a</span>
+</span><span class='line'><span class="n">total</span> <span class="mi">8</span>
+</span><span class='line'><span class="n">drwxr</span><span class="o">-</span><span class="n">x</span><span class="o">--</span><span class="n">x</span><span class="p">.</span> <span class="mi">2</span> <span class="n">fsj</span> <span class="n">fsj</span> <span class="mi">4096</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">14</span><span class="o">:</span><span class="mi">24</span> <span class="p">.</span>
+</span><span class='line'><span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span><span class="p">.</span> <span class="mi">3</span> <span class="n">fsj</span> <span class="n">fsj</span> <span class="mi">4096</span> <span class="n">Mar</span> <span class="mi">17</span> <span class="mi">22</span><span class="o">:</span><span class="mo">06</span> <span class="p">..</span>
+</span><span class='line'><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">fsj</span> <span class="n">fsj</span>    <span class="mi">0</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">14</span><span class="o">:</span><span class="mo">07</span> <span class="n">a</span>
+</span><span class='line'><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">fsj</span> <span class="n">fsj</span>    <span class="mi">0</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">14</span><span class="o">:</span><span class="mo">07</span> <span class="n">b</span>
+</span><span class='line'><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">fsj</span> <span class="n">fsj</span>    <span class="mi">0</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">14</span><span class="o">:</span><span class="mo">07</span> <span class="n">c</span>
+</span><span class='line'><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">fsj</span> <span class="n">fsj</span>    <span class="mi">0</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">14</span><span class="o">:</span><span class="mo">07</span> <span class="n">d</span>
+</span><span class='line'><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">fsj</span> <span class="n">fsj</span>    <span class="mi">0</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">14</span><span class="o">:</span><span class="mi">24</span> <span class="p">.</span><span class="n">hiden</span>
+</span><span class='line'><span class="o">-</span><span class="n">rwxr</span><span class="o">--</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">fsj</span> <span class="n">fsj</span>    <span class="mi">0</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">13</span><span class="o">:</span><span class="mi">10</span> <span class="n">shit</span><span class="p">.</span><span class="n">c</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>其中<code>ll</code>等价于<code>ls -l</code>.</p>
+
+<p>查看当前路径</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">pwd</span>
+</span><span class='line'><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">fsj</span><span class="o">/</span><span class="n">temp</span><span class="o">/</span><span class="n">shit</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>3 如何对文件和目录进行操作呢？
+
+<ul>
+<li>file fileName： 显示指定file的信息</li>
+<li>touch fileName：更新指定文件的时间，或新建空文件</li>
+<li>cp path1 path2：将path1的文件复制到path2</li>
+<li>rm fileName：删除指定文件</li>
+<li>mv：移动指定文件（类似cp），或重命名文件</li>
+<li>find：查找文件，如：find ./logs/ -name &lsquo;error*' 表示在logs目录下查找名称以error开头的文件</li>
+</ul>
+</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">file</span> <span class="n">a</span>
+</span><span class='line'><span class="nl">a</span><span class="p">:</span> <span class="n">ASCII</span> <span class="n">text</span>
+</span><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">cp</span> <span class="n">a</span> <span class="n">a</span><span class="o">-</span><span class="n">bak</span>
+</span><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">ls</span>
+</span><span class='line'><span class="n">a</span>  <span class="n">a</span><span class="o">-</span><span class="n">bak</span>  <span class="n">b</span>  <span class="n">c</span>  <span class="n">d</span>  <span class="n">shit</span><span class="p">.</span><span class="n">c</span>
+</span><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">mv</span> <span class="n">a</span> <span class="n">a</span><span class="o">-</span><span class="n">origin</span>
+</span><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">ls</span>
+</span><span class='line'><span class="n">a</span><span class="o">-</span><span class="n">bak</span>  <span class="n">a</span><span class="o">-</span><span class="n">origin</span>  <span class="n">b</span>  <span class="n">c</span>  <span class="n">d</span>  <span class="n">shit</span><span class="p">.</span><span class="n">c</span>
+</span><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">find</span>  <span class="n">a</span><span class="o">*</span>
+</span><span class='line'><span class="n">a</span><span class="o">-</span><span class="n">bak</span>
+</span><span class='line'><span class="n">a</span><span class="o">-</span><span class="n">origin</span>
+</span><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">rm</span> <span class="n">a</span><span class="o">-</span><span class="n">bak</span>
+</span><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">ls</span>
+</span><span class='line'><span class="n">a</span><span class="o">-</span><span class="n">origin</span>  <span class="n">b</span>  <span class="n">c</span>  <span class="n">d</span>  <span class="n">shit</span><span class="p">.</span><span class="n">c</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>4 如何文本文件？
+
+<ul>
+<li>cat fileName：显示指定文件的全部内容</li>
+<li>more：分页显示指定文件</li>
+<li>less：分页显示指定文件</li>
+<li>head：显示指定文件头部的信息</li>
+<li>tail：显示指定文件尾部的信息</li>
+</ul>
+</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">cat</span> <span class="n">a</span><span class="o">-</span><span class="n">origin</span>
+</span><span class='line'><span class="n">aaaaa</span>
+</span><span class='line'><span class="mi">2</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<ul>
+<li>5 命令使用技巧[2]</li>
+</ul>
+
+
+<p> 在终端输入命令，按回车执行
+ - 命令可用tab键自动进行补齐
+ - 一般可使用-h、-help或&ndash;help参数查看命令 的说明以及该命令可用的参数
+ - 使用man(manual)命令也可查看其它命令的 说明以及其可用的参数   <br/>
+  - 格式：man 其它命令</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">man</span> <span class="n">cat</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p> 包括前面用到的几个命令在内，Linux命令可以分类如下：
+ - 浏览目录命令:ls  pwd  cd
+ - 浏览文件命令:ls  cat  more  less  head  tail
+ - 目录操作命令:chmod  mkdir  rm  mv  cp  find
+ - 文件操作命令:chmod  vi  rm  mv  cp  ln  find  grep  tar  gzip</p>
+
+<h1>如何编辑文件？——vim编辑器入门</h1>
+
+<p>vim编辑器是需要CentOS自带的vi编辑器的加强版，需要下载：<code># yum install vim</code>.<br/>
+这里简单举两个栗子：
+- 1 新建文件hello.txt，输入内容，保存并退出
+  - <code>$ vim hello.txt</code>
+  - 按i键进入编辑模式，输入三行内容
+  - 按ESC键进入命令模式，输入<code>:wq</code>，保存并退出
+- 2 编辑hello.txt，删除第一行，复制第二行到尾部</p>
+
+<p><img src="http://7xo0zf.com1.z0.glb.clouddn.com/16-3-27/72770552.jpg" alt="" /></p>
+
+<p>试着操作之后会对命令模式与插入模式有直观的了解。</p>
+
+<h1>用户管理</h1>
+
+<ul>
+<li>1 借助GUI新建用户<code>test0</code></li>
+</ul>
+
+
+<p><img src="http://7xo0zf.com1.z0.glb.clouddn.com/16-3-27/28596222.jpg" alt="" /><br/>
+查看该用户的home目录：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">home</span><span class="p">]</span><span class="err">#</span> <span class="n">ll</span> <span class="o">-</span><span class="n">a</span> <span class="n">test0</span><span class="o">/</span>
+</span><span class='line'><span class="n">total</span> <span class="mi">32</span>
+</span><span class='line'><span class="n">drwx</span><span class="o">------</span><span class="p">.</span> <span class="mi">4</span> <span class="n">test0</span> <span class="n">test0</span> <span class="mi">4096</span> <span class="n">Mar</span>  <span class="mi">6</span> <span class="mi">19</span><span class="o">:</span><span class="mi">44</span> <span class="p">.</span>
+</span><span class='line'><span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span><span class="p">.</span> <span class="mi">4</span> <span class="n">root</span>  <span class="n">root</span>  <span class="mi">4096</span> <span class="n">Mar</span>  <span class="mi">6</span> <span class="mi">19</span><span class="o">:</span><span class="mi">44</span> <span class="p">..</span>
+</span><span class='line'><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">test0</span> <span class="n">test0</span>   <span class="mi">18</span> <span class="n">Jul</span> <span class="mi">24</span>  <span class="mi">2015</span> <span class="p">.</span><span class="n">bash_logout</span>
+</span><span class='line'><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">test0</span> <span class="n">test0</span>  <span class="mi">176</span> <span class="n">Jul</span> <span class="mi">24</span>  <span class="mi">2015</span> <span class="p">.</span><span class="n">bash_profile</span>
+</span><span class='line'><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">test0</span> <span class="n">test0</span>  <span class="mi">124</span> <span class="n">Jul</span> <span class="mi">24</span>  <span class="mi">2015</span> <span class="p">.</span><span class="n">bashrc</span>
+</span><span class='line'><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">test0</span> <span class="n">test0</span>  <span class="mi">500</span> <span class="n">Nov</span> <span class="mi">27</span>  <span class="mi">2014</span> <span class="p">.</span><span class="n">emacs</span>
+</span><span class='line'><span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span><span class="p">.</span> <span class="mi">2</span> <span class="n">test0</span> <span class="n">test0</span> <span class="mi">4096</span> <span class="n">Nov</span> <span class="mi">12</span>  <span class="mi">2010</span> <span class="p">.</span><span class="n">gnome2</span>
+</span><span class='line'><span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span><span class="p">.</span> <span class="mi">4</span> <span class="n">test0</span> <span class="n">test0</span> <span class="mi">4096</span> <span class="n">Mar</span>  <span class="mi">6</span> <span class="mi">17</span><span class="o">:</span><span class="mo">00</span> <span class="p">.</span><span class="n">mozilla</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>2 用<code>useradd</code>新建用户<code>test1</code>，并添加密码</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">home</span><span class="p">]</span><span class="err">#</span> <span class="n">useradd</span> <span class="n">test1</span>
+</span><span class='line'><span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">home</span><span class="p">]</span><span class="err">#</span> <span class="n">passwd</span> <span class="n">test1</span>
+</span><span class='line'><span class="n">Changing</span> <span class="n">password</span> <span class="k">for</span> <span class="n">user</span> <span class="n">test1</span><span class="p">.</span>
+</span><span class='line'><span class="n">New</span> <span class="nl">password</span><span class="p">:</span>
+</span><span class='line'><span class="n">BAD</span> <span class="nl">PASSWORD</span><span class="p">:</span> <span class="n">it</span> <span class="n">is</span> <span class="n">WAY</span> <span class="n">too</span> <span class="kt">short</span>
+</span><span class='line'><span class="n">BAD</span> <span class="nl">PASSWORD</span><span class="p">:</span> <span class="n">is</span> <span class="n">a</span> <span class="n">palindrome</span>
+</span><span class='line'><span class="n">Retype</span> <span class="n">new</span> <span class="nl">password</span><span class="p">:</span>
+</span><span class='line'><span class="nl">passwd</span><span class="p">:</span> <span class="n">all</span> <span class="n">authentication</span> <span class="n">tokens</span> <span class="n">updated</span> <span class="n">successfully</span><span class="p">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">home</span><span class="p">]</span><span class="err">#</span> <span class="n">ll</span> <span class="o">-</span><span class="n">a</span> <span class="n">test1</span><span class="o">/</span>
+</span><span class='line'><span class="n">total</span> <span class="mi">32</span>
+</span><span class='line'><span class="n">drwx</span><span class="o">------</span><span class="p">.</span> <span class="mi">4</span> <span class="n">test1</span> <span class="n">test1</span> <span class="mi">4096</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">11</span><span class="o">:</span><span class="mi">41</span> <span class="p">.</span>
+</span><span class='line'><span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span><span class="p">.</span> <span class="mi">5</span> <span class="n">root</span>  <span class="n">root</span>  <span class="mi">4096</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">11</span><span class="o">:</span><span class="mi">41</span> <span class="p">..</span>
+</span><span class='line'><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">test1</span> <span class="n">test1</span>   <span class="mi">18</span> <span class="n">Jul</span> <span class="mi">24</span>  <span class="mi">2015</span> <span class="p">.</span><span class="n">bash_logout</span>
+</span><span class='line'><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">test1</span> <span class="n">test1</span>  <span class="mi">176</span> <span class="n">Jul</span> <span class="mi">24</span>  <span class="mi">2015</span> <span class="p">.</span><span class="n">bash_profile</span>
+</span><span class='line'><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">test1</span> <span class="n">test1</span>  <span class="mi">124</span> <span class="n">Jul</span> <span class="mi">24</span>  <span class="mi">2015</span> <span class="p">.</span><span class="n">bashrc</span>
+</span><span class='line'><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">test1</span> <span class="n">test1</span>  <span class="mi">500</span> <span class="n">Nov</span> <span class="mi">27</span>  <span class="mi">2014</span> <span class="p">.</span><span class="n">emacs</span>
+</span><span class='line'><span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span><span class="p">.</span> <span class="mi">2</span> <span class="n">test1</span> <span class="n">test1</span> <span class="mi">4096</span> <span class="n">Nov</span> <span class="mi">12</span>  <span class="mi">2010</span> <span class="p">.</span><span class="n">gnome2</span>
+</span><span class='line'><span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span><span class="p">.</span> <span class="mi">4</span> <span class="n">test1</span> <span class="n">test1</span> <span class="mi">4096</span> <span class="n">Mar</span>  <span class="mi">6</span> <span class="mi">17</span><span class="o">:</span><span class="mo">00</span> <span class="p">.</span><span class="n">mozilla</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>3 切换用户</li>
+</ul>
+
+
+<p>test0&ndash;>test1&ndash;>root</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">[</span><span class="n">test0</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">home</span><span class="p">]</span><span class="err">$</span> <span class="n">su</span> <span class="n">test1</span>
+</span><span class='line'><span class="nl">Password</span><span class="p">:</span>
+</span><span class='line'><span class="p">[</span><span class="n">test1</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">home</span><span class="p">]</span><span class="err">$</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">[</span><span class="n">test1</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">home</span><span class="p">]</span><span class="err">$</span> <span class="n">su</span>
+</span><span class='line'><span class="nl">Password</span><span class="p">:</span>
+</span><span class='line'><span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">home</span><span class="p">]</span><span class="err">#</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>4 删除用户</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">home</span><span class="p">]</span><span class="err">#</span> <span class="n">userdel</span> <span class="n">test1</span>
+</span><span class='line'><span class="nl">userdel</span><span class="p">:</span> <span class="n">user</span> <span class="n">test1</span> <span class="n">is</span> <span class="n">currently</span> <span class="n">used</span> <span class="n">by</span> <span class="n">process</span> <span class="mi">3087</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>删除失败，接着参数<code>rf</code>，强制删除</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">home</span><span class="p">]</span><span class="err">#</span> <span class="n">userdel</span> <span class="o">-</span><span class="n">rf</span> <span class="n">test1</span>
+</span><span class='line'><span class="nl">userdel</span><span class="p">:</span> <span class="n">user</span> <span class="n">test1</span> <span class="n">is</span> <span class="n">currently</span> <span class="n">used</span> <span class="n">by</span> <span class="n">process</span> <span class="mi">3087</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>虽然依然提示test1正在被使用，但是删除成功了。其中r表示删除该用户的home文件夹，f表示强制删除。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">home</span><span class="p">]</span><span class="err">#</span> <span class="n">userdel</span> <span class="o">-</span><span class="n">h</span>
+</span><span class='line'><span class="nl">Usage</span><span class="p">:</span> <span class="n">userdel</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span> <span class="n">LOGIN</span>
+</span><span class='line'>
+</span><span class='line'><span class="nl">Options</span><span class="p">:</span>
+</span><span class='line'>  <span class="o">-</span><span class="n">f</span><span class="p">,</span> <span class="o">--</span><span class="n">force</span>                   <span class="n">force</span> <span class="n">removal</span> <span class="n">of</span> <span class="n">files</span><span class="p">,</span>
+</span><span class='line'>                                <span class="n">even</span> <span class="k">if</span> <span class="n">not</span> <span class="n">owned</span> <span class="n">by</span> <span class="n">user</span>
+</span><span class='line'>  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>                    <span class="n">display</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span> <span class="n">and</span> <span class="n">exit</span>
+</span><span class='line'>  <span class="o">-</span><span class="n">r</span><span class="p">,</span> <span class="o">--</span><span class="n">remove</span>                  <span class="n">remove</span> <span class="n">home</span> <span class="n">directory</span> <span class="n">and</span> <span class="n">mail</span> <span class="n">spool</span>
+</span><span class='line'>  <span class="o">-</span><span class="n">Z</span><span class="p">,</span> <span class="o">--</span><span class="n">selinux</span><span class="o">-</span><span class="n">user</span>            <span class="n">remove</span> <span class="n">SELinux</span> <span class="n">user</span> <span class="n">from</span> <span class="n">SELinux</span> <span class="n">user</span> <span class="n">mapping</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>拾遗</li>
+</ul>
+
+
+<p>Linux下有三类用户，超级用户(root)具有操作系统的一切权限，UID值均为0。普通用户具有操作系统有限的权限，只能管理自己启动的进程，UID值500~6000。系统用户是为了方便系统管理，满足相应的系统进程对文件属主的的要求，系统用户不能登录，UID值1~499。</p>
+
+<p>这里新建普通用户的UID会依次增长，fsj为500，test0为501，test1为502</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="err">$</span> <span class="n">id</span> <span class="n">fsj</span>
+</span><span class='line'><span class="n">uid</span><span class="o">=</span><span class="mi">500</span><span class="p">(</span><span class="n">fsj</span><span class="p">)</span> <span class="n">gid</span><span class="o">=</span><span class="mi">500</span><span class="p">(</span><span class="n">fsj</span><span class="p">)</span> <span class="n">groups</span><span class="o">=</span><span class="mi">500</span><span class="p">(</span><span class="n">fsj</span><span class="p">)</span>
+</span><span class='line'><span class="err">$</span> <span class="n">id</span> <span class="n">test0</span>
+</span><span class='line'><span class="n">uid</span><span class="o">=</span><span class="mi">501</span><span class="p">(</span><span class="n">test0</span><span class="p">)</span> <span class="n">gid</span><span class="o">=</span><span class="mi">501</span><span class="p">(</span><span class="n">test0</span><span class="p">)</span> <span class="n">groups</span><span class="o">=</span><span class="mi">501</span><span class="p">(</span><span class="n">test0</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>文件/目录权限管理</h1>
+
+<ul>
+<li>1 文件详情中有权限信息</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">ll</span>
+</span><span class='line'><span class="n">total</span> <span class="mi">0</span>
+</span><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">touch</span> <span class="n">shit</span><span class="p">.</span><span class="n">c</span>
+</span><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">ll</span>
+</span><span class='line'><span class="n">total</span> <span class="mi">0</span>
+</span><span class='line'><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">fsj</span> <span class="n">fsj</span> <span class="mi">0</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">13</span><span class="o">:</span><span class="mi">10</span> <span class="n">shit</span><span class="p">.</span><span class="n">c</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>其中第一列<code>-rw-rw-r--</code>表示当前文件权限，其他列see also：[4].<br/>
+这一列的第一个字符表示文件类型。取值包括：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">d</span> <span class="err">：目录</span>
+</span><span class='line'><span class="o">-</span> <span class="err">：文件</span>
+</span><span class='line'><span class="n">l</span> <span class="err">：链接</span>
+</span><span class='line'><span class="n">s</span> <span class="err">：</span><span class="n">socket</span>
+</span><span class='line'><span class="n">p</span> <span class="err">：</span><span class="n">named</span> <span class="n">pipe</span>
+</span><span class='line'><span class="n">b</span> <span class="err">：</span><span class="n">block</span> <span class="n">device</span>
+</span><span class='line'><span class="n">c</span>  <span class="err">：</span><span class="n">character</span> <span class="n">device</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>剩下9位，3为一组。格式为：[属主权限][属组用户权限][其他用户权限]</p>
+
+<p>属主和属组用户为<code>rw-</code>，有读、写权限。<br/>
+其他用户为<code>r--</code>，有读权限。</p>
+
+<ul>
+<li>2 用chmod设置文件权限</li>
+</ul>
+
+
+<p>把前面shit.c权限改为只允许属主读写执行(rwx)，其他用户只能读&reg;.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">chmod</span> <span class="mi">744</span> <span class="n">shit</span><span class="p">.</span><span class="n">c</span>
+</span><span class='line'><span class="p">[</span><span class="n">fsj</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">shit</span><span class="p">]</span><span class="err">$</span> <span class="n">ll</span>
+</span><span class='line'><span class="n">total</span> <span class="mi">0</span>
+</span><span class='line'><span class="o">-</span><span class="n">rwxr</span><span class="o">--</span><span class="n">r</span><span class="o">--</span><span class="p">.</span> <span class="mi">1</span> <span class="n">fsj</span> <span class="n">fsj</span> <span class="mi">0</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">13</span><span class="o">:</span><span class="mi">10</span> <span class="n">shit</span><span class="p">.</span><span class="n">c</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>744什么和rwx对应起来的呢？</p>
+
+<p>我们用二进制来表示是否允许某个权限，允许就置1，不允许就置0，比如777表示所有用户都有读、写、执行权限。
+7<code>7</code>7（8进制）=111<code>111</code>111（2进制），9位都置一，就是所有权限都开。<br/>
+这里7<code>4</code>4（8进制）=111<code>100</code>100（2进制），属主读写执行(rwx)，其他用户只能读&reg;.</p>
+
+<p>换算的时候rwx权重分别看作421那就简单了，比如<code>rw-</code>就是<code>110</code>，也是<code>6</code>.</p>
+
+<p>修改权限有什么用呢？当你搞一些配置文件的时候会想起来的~</p>
+
+<h1>ref</h1>
+
+<ul>
+<li>[1] <a href="http://linuxtools-rst.readthedocs.org/zh_CN/latest/index.html">linux工具快速教程</a></li>
+<li>[2] Linux入门——郭桂鑫</li>
+<li>[3] <a href="http://www.2cto.com/os/201408/328936.html">Linux中添加用户、删除用户时新手可能遇到的问题</a></li>
+<li>[4] <a href="http://blog.csdn.net/jenminzhang/article/details/9816853"> Linux &ldquo;ls -l"文件列表权限详解</a></li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+
+
+  <span class="byline author vcard">Authored by <span class="fn">
+  
+    lawlietfans
+  
+  </span></span>
+
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-03-07T20:00:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>8:00 pm</span></time>
+      
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/linux/'>linux</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/02/29/introduction-and-centos67-install/" title="Previous Post: Linux服务器配置和管理：虚拟机安装CentOS6.7">&laquo; Linux服务器配置和管理：虚拟机安装CentOS6.7</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2016/12/27/how-to-setup-ST3-dev-env/" title="Next Post: Sublime Text3下快速搭建开发环境">Sublime Text3下快速搭建开发环境 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+   <!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="/blog/2016/03/07/linux-foundation" data-title="Linux服务器配置和管理：一般管理" data-url="http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"lawlietfans-coding"};
+    (function() {
+
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+     })();
+ </script>
+ <!-- 多说公共JS代码 end -->
+
+  </section>
+<!--
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+-->
+
+<!--
+
+-->
+</div>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2017 - lawlietfans -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a> | Themed with <a href="https://github.com/lucaslew/whitespace">Whitespace</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+
+</body>
+</html>

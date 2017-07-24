@@ -1,0 +1,929 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Linux | 畑鹿驚 - 博客]]></title>
+  <link href="http://lawlietfans.coding.me/blog/categories/linux/atom.xml" rel="self"/>
+  <link href="http://lawlietfans.coding.me/"/>
+  <updated>2017-01-19T00:11:00+08:00</updated>
+  <id>http://lawlietfans.coding.me/</id>
+  <author>
+    <name><![CDATA[lawlietfans]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Zabbix概念、安装以及快速入门]]></title>
+    <link href="http://lawlietfans.coding.me/blog/2017/01/15/zabbix-quick-start/"/>
+    <updated>2017-01-15T20:00:00+08:00</updated>
+    <id>http://lawlietfans.coding.me/blog/2017/01/15/zabbix-quick-start</id>
+    <content type="html"><![CDATA[<p>Zabbix is an enterprise-class open source distributed monitoring solution.[1]</p>
+
+<p>Zabbix是一个企业级的、开源的、分布式的监控套件</p>
+
+<ul>
+<li>Zabbix可以监控网络和服务的监控状况.</li>
+<li>Zabbix利用灵活的告警机制，允许用户对事件发送基于Email的告警. 这样可以保证快速的对问题作出相应.</li>
+<li>Zabbix是零成本的. 因为Zabbix编写和发布基于GPL V2协议. 意味着源代码是免费发布的.</li>
+</ul>
+
+
+<!--more-->
+
+
+<p>Zabbix特性如下[2]：</p>
+
+<ol>
+<li>数据收集</li>
+<li>灵活的阀值定义</li>
+<li>高级告警配置</li>
+<li>实时绘图</li>
+<li>扩展的图形化显示</li>
+<li>历史数据存储</li>
+<li>配置简单</li>
+<li>模板使用</li>
+<li>网络自动发现</li>
+<li>快速的web接口</li>
+<li>Zabbix API</li>
+<li>权限系统</li>
+<li>全特性、agent易扩展</li>
+<li>二进制守护进程</li>
+<li>具备应对复杂环境情况</li>
+</ol>
+
+
+<p>可以总结为如下三个特点</p>
+
+<p>1）灵活的通知机制：allows users to configure e-mail based alerts for virtually any event；</p>
+
+<p>2）数据可视化；</p>
+
+<p>3）所有报告、统计、参数配置都可通过web端完成；</p>
+
+<p>所以zabbix很适合服务器集群管理员进行功能规划(capacity planning)</p>
+
+<h1>1 概览</h1>
+
+<ul>
+<li>架构
+
+<ul>
+<li>Server</li>
+<li>database storage</li>
+<li>web interface</li>
+<li>proxy</li>
+<li>agent</li>
+</ul>
+</li>
+<li>数据流(data flow)</li>
+</ul>
+
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115155021369-2100463231.png" alt="arch" /></p>
+
+<p>其中，Zabbix Server为中心组件，用来获取agent存活状况及监控数据和统计. 所有的配置、统计、操作数据均通过Server进行存取.</p>
+
+<p>Zabbix agent部署在被监控机器上用来监控本地资源和应用（如硬盘、内存、处理器统计等）</p>
+
+<h1>2 术语概念</h1>
+
+<h2>2.1 server / client / proxy</h2>
+
+<p>Zabbix server的功能可以分为三部分：server、web前端和database。</p>
+
+<p>Server执行polling和trapping来采集数据，评估是否触发触发器，发送报警给用户</p>
+
+<p>agent向其报告有效数据和统计。</p>
+
+<p>database存储所有configuration, statistical and operational data。</p>
+
+<p>server和web前端都与database进行交互。</p>
+
+<p>Zabbix server以守护(daemon)进程方式运行</p>
+
+<h2>2.2 命令行工具</h2>
+
+<p>Sender / Get</p>
+
+<h1>3 zabbix进程构成 [3]</h1>
+
+<pre><code class="c">默认情况下zabbix包含5个程序：
+zabbix_agentd、zabbix_get、zabbix_proxy、zabbix_sender、zabbix_server，另外一个zabbix_java_gateway是可选
+
+zabbix_agentd
+客户端守护进程，此进程收集客户端数据，例如cpu负载、内存、硬盘使用情况等
+
+zabbix_get
+zabbix工具，单独使用的命令，通常在server或者proxy端执行获取远程客户端信息的命令。
+通常用户排错。例如在server端获取不到客户端的内存数据，我们可以使用zabbix_get获取客户端的内容的方式来做故障排查。
+
+zabbix_sender
+zabbix工具，用于发送数据给server或者proxy，通常用于耗时比较长的检查。
+很多检查非常耗时间，导致zabbix超时。于是我们在脚本执行完毕之后，使用sender主动提交数据。
+
+zabbix_server
+zabbix服务端守护进程。
+zabbix_agentd、zabbix_get、zabbix_sender、zabbix_proxy、zabbix_java_gateway的数据最终都是提交到server
+备注：当然不是数据都是主动提交给zabbix_server,也有的是server主动去取数据。
+
+zabbix_proxy
+zabbix代理守护进程。功能类似server，
+唯一不同的是它只是一个中转站，它需要把收集到的数据提交/被提交到server里。
+
+zabbix_java_gateway
+zabbix2.0之后引入的一个功能。顾名思义：Java网关，类似agentd，但是只用于Java方面。
+需要特别注意的是，它只能主动去获取数据，而不能被动获取数据。它的数据最终会给到server或者proxy。
+</code></pre>
+
+<h1>4 安装zabbix</h1>
+
+<p>首先安装MariaDB数据库。Linux发行版，使用<a href="https://downloads.mariadb.org/mariadb/repositories/">repository configuration tool</a>，选择自己合适的安装步骤。</p>
+
+<ul>
+<li>卸载mysql</li>
+</ul>
+
+
+<p>如果已经安装了mysql，需要先卸载mysql，否则安装过程中会出现冲突。</p>
+
+<ul>
+<li>本机选择10.1stable for centos7 x86_64</li>
+</ul>
+
+
+<pre><code class="sh">//添加源
+shell&gt; cat /etc/yum.repos.d/mariaDB.repo
+[mariadb]
+name = MariaDB
+baseurl = http://yum.mariadb.org/10.1/centos7-amd64
+gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgcheck=1
+
+shell&gt; yum install MariaDB-server MariaDB-client mariadb
+
+//服务管理，使用如下命令start/stop MariaDB:
+shell&gt; sudo systemctl start mariadb.service #直接用mariadb也行
+shell&gt; sudo systemctl stop mariadb.service
+shell&gt; sudo systemctl enable mariadb.service #开机自启动
+</code></pre>
+
+<p>从10.1起，Galera Cluster(同步MariaDB数据库的多master集群的工具)默认包含在MariaDB中。</p>
+
+<p>see also <a href="https://mariadb.com/kb/en/mariadb/yum/">Installing MariaDB with yum</a>.</p>
+
+<h2>4.1 zabbix sever [4]</h2>
+
+<p>安装</p>
+
+<pre><code class="sh">shell&gt; rpm -ivh http://repo.zabbix.com/zabbix/2.2/rhel/7/x86_64/zabbix-release-2.2-1.el7.noarch.rpm
+//for Zabbix server and web frontend with mysql database
+shell&gt; yum install zabbix-server-mysql zabbix-web-mysql
+//可以将server与agent安装在同一台机器
+shell&gt; yum install zabbix-agent
+</code></pre>
+
+<p>创建zabbix数据库以及远程用户</p>
+
+<pre><code class="c">[user@host ~]# mysql -uroot -p
+
+MariaDB [(none)]&gt; create database zabbix character set utf8 collate utf8_bin;
+MariaDB [(none)]&gt; grant all privileges on zabbix.* to zabbix@localhost identified by 'your_password';
+MariaDB [(none)]&gt; grant all privileges on zabbix.* to zabbix@'172.16.%.%' identified by 'your_password';
+MariaDB [(none)]&gt; flush privileges;
+MariaDB [(none)]&gt; select host,user from mysql.user;
++-----------------------+--------+
+| host                  | user   |
++-----------------------+--------+
+| 127.0.0.1             | root   |
+| 172.16.%.%            | zabbix |
+| ::1                   | root   |
+| localhost             |        |
+| localhost             | fsj    |
+| localhost             | root   |
+| localhost             | zabbix |
+| localhost.localdomain |        |
++-----------------------+--------+
+</code></pre>
+
+<ul>
+<li>导入初始化schema和data</li>
+</ul>
+
+
+<pre><code class="sh">shell&gt; cd /usr/share/doc/zabbix-server-mysql-2.2.15/create
+shell&gt; mysql -uroot -p  zabbix &lt; schema.sql
+shell&gt; mysql -uroot -p  zabbix &lt; images.sql
+shell&gt; mysql -uroot -p  zabbix &lt; data.sql
+</code></pre>
+
+<ul>
+<li>Edit database configuration in zabbix_server.conf</li>
+</ul>
+
+
+<pre><code class="sh">shell&gt; vi /etc/zabbix/zabbix_server.conf
+DBHost=localhost
+DBName=zabbix
+DBUser=zabbix
+DBPassword=zabbix
+</code></pre>
+
+<ul>
+<li><p>开启zabbix-server服务：systemctl start zabbix-server</p></li>
+<li><p>Editing PHP configuration for Zabbix frontend</p>
+
+<ul>
+<li>修改timezone：<code>php_value date.timezone Asia/Shanghai</code></li>
+<li>重启httpd服务：service httpd restart</li>
+</ul>
+</li>
+</ul>
+
+
+<p>或者通过sed调整php配置[6]</p>
+
+<pre><code class="sh">shell&gt; sed -i 's/^.*date.timezone =.*$/date.timezone = Asia\/Shanghai/g' /etc/php.ini
+shell&gt; sed -i 's/^.*post_max_size =.*$/post_max_size = 16M/g' /etc/php.ini
+shell&gt; sed -i 's/^.*max_execution_time =.*$/max_execution_time = 300/g' /etc/php.ini
+shell&gt; sed -i 's/^.*max_input_time =.*$/max_input_time = 300/g' /etc/php.ini
+shell&gt; sed -i 's/^.* memory_limit =.*$/memory_limit = 128M/g'  /etc/php.ini
+shell&gt; service httpd restart
+</code></pre>
+
+<ul>
+<li>配置服务开机启动</li>
+</ul>
+
+
+<pre><code class="sh">shell&gt; chkconfig zabbix-server on
+shell&gt; chkconfig zabbix-agent on
+shell&gt; chkconfig httpd on
+</code></pre>
+
+<p>访问 <a href="http://your-zabbix-server-ip/zabbix">http://your-zabbix-server-ip/zabbix</a></p>
+
+<p>默认username/password 是Admin/zabbix.</p>
+
+<ul>
+<li>如果出现错误：zabbix server is not running</li>
+</ul>
+
+
+<p><a href="https://my.oschina.net/u/1590519/blog/330357">解决办法</a>：设置SELinux 成为permissive模式  <code>shell&gt; setenforce 0</code></p>
+
+<ul>
+<li>如果出现防火墙相关问题，打开agent的端口</li>
+</ul>
+
+
+<pre><code class="sh">查看zabbix监听端口：
+shell&gt; netstat -nlop | grep zabbix
+tcp        0      0 0.0.0.0:10051           0.0.0.0:*               LISTEN      23904/zabbix_server  off (0.00/0/0)
+tcp6       0      0 :::10051                :::*                    LISTEN      23904/zabbix_server  off (0.00/0/0)
+打开防火墙该端口：
+shell&gt; iptables -I INPUT -p tcp --dport 10051 -m state --state NEW,ESTABLISHED -j ACCEPT
+shell&gt; iptables -I OUTPUT -p tcp --sport 10051 -m state --state ESTABLISHED -j ACCEPT
+</code></pre>
+
+<p>也可以批量修改其他端口：
+<code>sh
+shell&gt; iptables-save &gt; firewalls.txt
+shell&gt; vim firewalls.txt
+shell&gt; iptables-restore &lt;firewalls.txt
+</code></p>
+
+<p>或者直接关闭防火墙：<code># systemctl stop firewalld</code></p>
+
+<p>see also <a href="http://www.cnblogs.com/pixy/p/5156739.html">Linux防火墙配置(iptables, firewalld)</a></p>
+
+<h2>4.2 zabbix agent</h2>
+
+<pre><code class="sh">shell&gt; sudo rpm -ivh http://repo.zabbix.com/zabbix/2.2/rhel/7/x86_64/zabbix-release-2.2-1.el7.noarch.rpm
+shell&gt; sudo yum install zabbix-agent zabbix-sender -y
+shell&gt; grep -Ev '(^$|^#)' /etc/zabbix/zabbix_agentd.conf  #修改server地址
+PidFile=/var/run/zabbix/zabbix_agentd.pid
+LogFile=/var/log/zabbix/zabbix_agentd.log
+LogFileSize=0
+Server=172.16.44.5
+Hostname=Zabbix server fsj
+Include=/etc/zabbix/zabbix_agentd.d/
+
+shell&gt; sudo service zabbix-agent start
+shell&gt; sudo systemctl enable zabbix-agent
+</code></pre>
+
+<h1>5 用户管理</h1>
+
+<p><img src="http://ww1.sinaimg.cn/large/7156462egw1fb0n5yw928j218e0e0jzk.jpg" alt="user list" /></p>
+
+<p><img src="http://ww1.sinaimg.cn/large/7156462egw1fb0njs2v9ij218g0cf7b0.jpg" alt="user groups list" /></p>
+
+<p>权限管理并不是直接设置一个user对应于一个host的什么权限，而是设置user groups对应与host groups的权限。</p>
+
+<p><img src="http://ww3.sinaimg.cn/large/7156462egw1fb0nmppfp0j20vy0futd2.jpg" alt="" /></p>
+
+<p>切换到permissions选项卡</p>
+
+<p><img src="http://ww4.sinaimg.cn/large/7156462egw1fb0nnyipqzj20zh0ohgq8.jpg" alt="" /></p>
+
+<h1>6 开始监控</h1>
+
+<h2>6.1 添加Zabbix agent（局域网其他机器）以及其item</h2>
+
+<p>新建host
+<img src="https://www.zabbix.com/documentation/2.2/_media/manual/quickstart/new_host.png" alt="new host" /></p>
+
+<p>其中，最好有一个Host name项和<code>/etc/zabbix/zabbix_agentd.conf</code>中Hostname保持一致。</p>
+
+<p>如果不存在host与配置文件中的Hostname相同，那么运行之后log文件会报错<code>host xxx(Hostname值) not found</code>，但是前端host条目依然可以获取到数据。</p>
+
+<p>修改conf文件后要重启服务才能生效</p>
+
+<p>新建item
+<img src="https://www.zabbix.com/documentation/2.2/_media/manual/quickstart/new_item.png" alt="new item" /></p>
+
+<p>其中key表示要监测的的信息。
+1. 详细：<a href="https://www.zabbix.com/documentation/2.2/manual/config/items/itemtypes/zabbix_agent">https://www.zabbix.com/documentation/2.2/manual/config/items/itemtypes/zabbix_agent</a>
+2. <a href="https://www.zabbix.com/documentation/2.2/manual/appendix/items/supported_by_platform">Items supported by platform</a></p>
+
+<p>在configuration->hosts页面可看到刚刚添加的host，如果available项为绿色Z表示一切正常。</p>
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115155508338-57307903.png" alt="host list" /></p>
+
+<p>有可能出现如下错误</p>
+
+<blockquote><p>Received empty response from Zabbix Agent at [x.x.x.x]. Assuming that agent dropped connection because of access permission</p></blockquote>
+
+<p>到Monitoring -> Latest data页面查看监控到的实时数据</p>
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115155638994-755881875.png" alt="latest data" /></p>
+
+<p>点击graph可以查看cpu load的折线图。</p>
+
+<h2>6.2 触发器</h2>
+
+<p>一个触发器包括一个定义了数据阈值的<a href="https://www.zabbix.com/documentation/2.2/manual/config/triggers/expression">表达式</a>。</p>
+
+<p>格式为<code>{&lt;server&gt;:&lt;key&gt;.&lt;function&gt;(&lt;parameter&gt;)}&lt;operator&gt;&lt;constant&gt;</code>。<br/>
+其中：
+1. key: 该server定义的item
+2. function: <a href="https://www.zabbix.com/documentation/2.2/manual/appendix/triggers/functions">https://www.zabbix.com/documentation/2.2/manual/appendix/triggers/functions</a>
+3. parameter: 数字n表示n秒，#n表示最近n个值，n[m|h|d]表示n[分钟|小时|天]</p>
+
+<p>输入数据如果高于该阈值，触发器就会报警。</p>
+
+<h3>6.2.1 创建触发器</h3>
+
+<p><img src="https://www.zabbix.com/documentation/2.2/_media/manual/quickstart/new_trigger.png" alt="new trigger" /></p>
+
+<p>激活触发器 <code>shell&gt; cat /dev/urandom | md5sum</code></p>
+
+<p><img src="http://ww4.sinaimg.cn/large/7156462egw1fazje03tolj217q0itgs1.jpg" alt="latest data graph of cpu load" /></p>
+
+<p><img src="http://ww4.sinaimg.cn/large/7156462egw1fazjga5c24j218b0iegsq.jpg" alt="monitoring-triggers" /></p>
+
+<p>更多触发器示例：</p>
+
+<ol>
+<li><code>{www.zabbix.com:system.cpu.load[all,avg1].last()}&gt;5</code></li>
+<li><code>{www.zabbix.com:system.cpu.load[all,avg1].last()}&gt;5|{www.zabbix.com:system.cpu.load[all,avg1].min(10m)}&gt;2</code></li>
+<li><code>{www.zabbix.com:vfs.file.cksum[/etc/passwd].diff()}=1</code></li>
+</ol>
+
+
+<h3>6.2.2 通知</h3>
+
+<p>Administration -> Media type 设置 email（需要有email软件支持）</p>
+
+<p><img src="https://www.zabbix.com/documentation/2.2/_media/manual/quickstart/1.9.7_media_type_email.png" alt="" /></p>
+
+<p>新建action</p>
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115155906385-1184761700.png" alt="" /></p>
+
+<p>查看发送情况</p>
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115160022431-741622625.png" alt="administration audit" /></p>
+
+<p>这里没有设email相关，所以发送失败</p>
+
+<h1>7 使用模版</h1>
+
+<p>点击host，切换到templates选项卡可以关联想要的模版。</p>
+
+<p><img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115160241322-10249453.png" alt="" /></p>
+
+<p>我们也可以通过 Configuration → Templates 可以创建空模版。然后把现有的item、trigger等拷贝到该模版，方便以后批量应用。
+<img src="http://images2015.cnblogs.com/blog/631533/201701/631533-20170115160503838-460061465.png" alt="" /></p>
+
+<h1>References</h1>
+
+<ol>
+<li><a href="https://www.zabbix.com/documentation/2.2/manual">https://www.zabbix.com/documentation/2.2/manual</a></li>
+<li><a href="http://zabbix-manual-in-chinese.readthedocs.io/en/latest/index.html">http://zabbix-manual-in-chinese.readthedocs.io/en/latest/index.html</a></li>
+<li><a href="http://www.ttlsa.com/zabbix/zabbix-section-3-of-chapter-1/">http://www.ttlsa.com/zabbix/zabbix-section-3-of-chapter-1/</a></li>
+<li><a href="https://www.zabbix.com/documentation/2.2/manual/quickstart">https://www.zabbix.com/documentation/2.2/manual/quickstart</a></li>
+<li><a href="http://www.ttlsa.com/zabbix/follow-ttlsa-to-study-zabbix/">跟着ttlsa一起学zabbix监控</a></li>
+<li><a href="http://www.cnblogs.com/Brandyn/p/5443491.html">监控 Zabbix</a></li>
+<li><a href="http://zabbix.org.cn">http://zabbix.org.cn</a></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Linux服务器配置和管理：一般管理]]></title>
+    <link href="http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/"/>
+    <updated>2016-03-07T20:00:00+08:00</updated>
+    <id>http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation</id>
+    <content type="html"><![CDATA[<blockquote><p>原文地址：<a href="http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/">http://lawlietfans.coding.me/blog/2016/03/07/linux-foundation/</a></p></blockquote>
+
+<!-- more -->
+
+
+<p>OUTLINE</p>
+
+<ul>
+<li>1 Step by step</li>
+<li>2 如何编辑文件？——vim编辑器入门</li>
+<li>3 用户管理</li>
+<li>4 文件/目录权限管理</li>
+<li>5 ref</li>
+</ul>
+
+
+<p><a href="http://lawlietfans.coding.me/blog/2016/02/29/introduction-and-centos67-install/">上一篇</a>提到，Linux发行版就是把系统内核、附带的工具程序以及应用软件包等打包在一起，组成的一个集合体或者套件。而CentOS是其中一种发行版。
+这是Linux操作系统的结构。</p>
+
+<p><img src="http://7xo0zf.com1.z0.glb.clouddn.com/16-3-26/78979443.jpg" alt="" /></p>
+
+<p>其结构可以用kernel、shell和utility三个不同层次的同心圆来表示。其中kernel控制着系统运行的各个方面，影响着一个系统的整体性能
+我们平时在Linux的使用中也大多是和shell、工具（utility）打交道。有了这些工具，程序员在shell命令行下几乎可以完成所有想做的工作，也正因为如此，Linux比Windows更加适合远程管理，因为后者的远程操作一般在GUI下完成，这无疑影响了服务器端的性能。</p>
+
+<p>Linux下的工具是非常丰富的，任何一个程序员都可以共享自己做的小工具。如果我们想要掌握这些工具的使用。最好是系统看书比如《鸟哥的私房菜》。不想看书的话，搜到的有些资料内容比较零散，有的可能像百科一样，太过于全面[1]。这里试图从初学者用的角度来了解、演示一些常用管理工具。</p>
+
+<h1>Step by step</h1>
+
+<ul>
+<li><p>1 xshell连上CentOS之后，如何关机重启呢？如何安装新软件？</p>
+
+<ul>
+<li><code>$ sudo shutdown -h</code> 或<code>halt</code></li>
+<li>重启系统：<code>$ sudo reboot</code></li>
+<li>安装git: <code>$ sudo yum install git</code></li>
+</ul>
+</li>
+<li><p>2 查看当前目录的信息</p></li>
+</ul>
+
+
+<p>ls（list）命令可用来显示目录的内容。配合参 数的使用，能以不同的方式显示目录内容。[4] <br/>
+格式：ls [参数]  [目录名或文件名]
+<code>c
+[fsj@vm-centos shit]$ ls
+a  b  c  d  shit.c
+[fsj@vm-centos shit]$ ll
+total 0
+-rw-rw-r--. 1 fsj fsj 0 Mar 27 14:07 a
+-rw-rw-r--. 1 fsj fsj 0 Mar 27 14:07 b
+-rw-rw-r--. 1 fsj fsj 0 Mar 27 14:07 c
+-rw-rw-r--. 1 fsj fsj 0 Mar 27 14:07 d
+-rwxr--r--. 1 fsj fsj 0 Mar 27 13:10 shit.c
+[fsj@vm-centos shit]$ ll -a
+total 8
+drwxr-x--x. 2 fsj fsj 4096 Mar 27 14:24 .
+drwxr-xr-x. 3 fsj fsj 4096 Mar 17 22:06 ..
+-rw-rw-r--. 1 fsj fsj    0 Mar 27 14:07 a
+-rw-rw-r--. 1 fsj fsj    0 Mar 27 14:07 b
+-rw-rw-r--. 1 fsj fsj    0 Mar 27 14:07 c
+-rw-rw-r--. 1 fsj fsj    0 Mar 27 14:07 d
+-rw-rw-r--. 1 fsj fsj    0 Mar 27 14:24 .hiden
+-rwxr--r--. 1 fsj fsj    0 Mar 27 13:10 shit.c
+</code>
+其中<code>ll</code>等价于<code>ls -l</code>.</p>
+
+<p>查看当前路径
+<code>c
+[fsj@vm-centos shit]$ pwd
+/home/fsj/temp/shit
+</code></p>
+
+<ul>
+<li>3 如何对文件和目录进行操作呢？
+
+<ul>
+<li>file fileName： 显示指定file的信息</li>
+<li>touch fileName：更新指定文件的时间，或新建空文件</li>
+<li>cp path1 path2：将path1的文件复制到path2</li>
+<li>rm fileName：删除指定文件</li>
+<li>mv：移动指定文件（类似cp），或重命名文件</li>
+<li>find：查找文件，如：find ./logs/ -name &lsquo;error*' 表示在logs目录下查找名称以error开头的文件</li>
+</ul>
+</li>
+</ul>
+
+
+<pre><code class="c">[fsj@vm-centos shit]$ file a
+a: ASCII text
+[fsj@vm-centos shit]$ cp a a-bak
+[fsj@vm-centos shit]$ ls
+a  a-bak  b  c  d  shit.c
+[fsj@vm-centos shit]$ mv a a-origin
+[fsj@vm-centos shit]$ ls
+a-bak  a-origin  b  c  d  shit.c
+[fsj@vm-centos shit]$ find  a* 
+a-bak
+a-origin
+[fsj@vm-centos shit]$ rm a-bak 
+[fsj@vm-centos shit]$ ls
+a-origin  b  c  d  shit.c
+</code></pre>
+
+<ul>
+<li>4 如何文本文件？
+
+<ul>
+<li>cat fileName：显示指定文件的全部内容</li>
+<li>more：分页显示指定文件</li>
+<li>less：分页显示指定文件</li>
+<li>head：显示指定文件头部的信息</li>
+<li>tail：显示指定文件尾部的信息</li>
+</ul>
+</li>
+</ul>
+
+
+<pre><code class="c">[fsj@vm-centos shit]$ cat a-origin 
+aaaaa
+2
+</code></pre>
+
+<ul>
+<li>5 命令使用技巧[2]</li>
+</ul>
+
+
+<p> 在终端输入命令，按回车执行
+ - 命令可用tab键自动进行补齐
+ - 一般可使用-h、-help或&ndash;help参数查看命令 的说明以及该命令可用的参数
+ - 使用man(manual)命令也可查看其它命令的 说明以及其可用的参数   <br/>
+  - 格式：man 其它命令</p>
+
+<pre><code class="c">[fsj@vm-centos shit]$ man cat
+</code></pre>
+
+<p> 包括前面用到的几个命令在内，Linux命令可以分类如下：
+ - 浏览目录命令:ls  pwd  cd
+ - 浏览文件命令:ls  cat  more  less  head  tail
+ - 目录操作命令:chmod  mkdir  rm  mv  cp  find
+ - 文件操作命令:chmod  vi  rm  mv  cp  ln  find  grep  tar  gzip</p>
+
+<h1>如何编辑文件？——vim编辑器入门</h1>
+
+<p>vim编辑器是需要CentOS自带的vi编辑器的加强版，需要下载：<code># yum install vim</code>.<br/>
+这里简单举两个栗子：
+- 1 新建文件hello.txt，输入内容，保存并退出
+  - <code>$ vim hello.txt</code>
+  - 按i键进入编辑模式，输入三行内容
+  - 按ESC键进入命令模式，输入<code>:wq</code>，保存并退出
+- 2 编辑hello.txt，删除第一行，复制第二行到尾部</p>
+
+<p><img src="http://7xo0zf.com1.z0.glb.clouddn.com/16-3-27/72770552.jpg" alt="" /></p>
+
+<p>试着操作之后会对命令模式与插入模式有直观的了解。</p>
+
+<h1>用户管理</h1>
+
+<ul>
+<li>1 借助GUI新建用户<code>test0</code></li>
+</ul>
+
+
+<p><img src="http://7xo0zf.com1.z0.glb.clouddn.com/16-3-27/28596222.jpg" alt="" /><br/>
+查看该用户的home目录：
+<code>c
+[root@vm-centos home]# ll -a test0/
+total 32
+drwx------. 4 test0 test0 4096 Mar  6 19:44 .
+drwxr-xr-x. 4 root  root  4096 Mar  6 19:44 ..
+-rw-r--r--. 1 test0 test0   18 Jul 24  2015 .bash_logout
+-rw-r--r--. 1 test0 test0  176 Jul 24  2015 .bash_profile
+-rw-r--r--. 1 test0 test0  124 Jul 24  2015 .bashrc
+-rw-r--r--. 1 test0 test0  500 Nov 27  2014 .emacs
+drwxr-xr-x. 2 test0 test0 4096 Nov 12  2010 .gnome2
+drwxr-xr-x. 4 test0 test0 4096 Mar  6 17:00 .mozilla
+</code></p>
+
+<ul>
+<li>2 用<code>useradd</code>新建用户<code>test1</code>，并添加密码</li>
+</ul>
+
+
+<pre><code class="c">[root@vm-centos home]# useradd test1
+[root@vm-centos home]# passwd test1
+Changing password for user test1.
+New password: 
+BAD PASSWORD: it is WAY too short
+BAD PASSWORD: is a palindrome
+Retype new password: 
+passwd: all authentication tokens updated successfully.
+</code></pre>
+
+<pre><code class="c">[root@vm-centos home]# ll -a test1/
+total 32
+drwx------. 4 test1 test1 4096 Mar 27 11:41 .
+drwxr-xr-x. 5 root  root  4096 Mar 27 11:41 ..
+-rw-r--r--. 1 test1 test1   18 Jul 24  2015 .bash_logout
+-rw-r--r--. 1 test1 test1  176 Jul 24  2015 .bash_profile
+-rw-r--r--. 1 test1 test1  124 Jul 24  2015 .bashrc
+-rw-r--r--. 1 test1 test1  500 Nov 27  2014 .emacs
+drwxr-xr-x. 2 test1 test1 4096 Nov 12  2010 .gnome2
+drwxr-xr-x. 4 test1 test1 4096 Mar  6 17:00 .mozilla
+</code></pre>
+
+<ul>
+<li>3 切换用户</li>
+</ul>
+
+
+<p>test0&ndash;>test1&ndash;>root
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">[</span><span class="n">test0</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">home</span><span class="p">]</span><span class="err">$</span> <span class="n">su</span> <span class="n">test1</span>
+</span><span class='line'><span class="nl">Password</span><span class="p">:</span>
+</span><span class='line'><span class="p">[</span><span class="n">test1</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">home</span><span class="p">]</span><span class="err">$</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">[</span><span class="n">test1</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">home</span><span class="p">]</span><span class="err">$</span> <span class="n">su</span>
+</span><span class='line'><span class="nl">Password</span><span class="p">:</span>
+</span><span class='line'><span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">home</span><span class="p">]</span><span class="err">#</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<ul>
+<li>4 删除用户</li>
+</ul>
+
+
+<pre><code class="c">[root@vm-centos home]# userdel test1
+userdel: user test1 is currently used by process 3087
+</code></pre>
+
+<p>删除失败，接着参数<code>rf</code>，强制删除
+<code>c
+[root@vm-centos home]# userdel -rf test1
+userdel: user test1 is currently used by process 3087
+</code></p>
+
+<p>虽然依然提示test1正在被使用，但是删除成功了。其中r表示删除该用户的home文件夹，f表示强制删除。
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">vm</span><span class="o">-</span><span class="n">centos</span> <span class="n">home</span><span class="p">]</span><span class="err">#</span> <span class="n">userdel</span> <span class="o">-</span><span class="n">h</span>
+</span><span class='line'><span class="nl">Usage</span><span class="p">:</span> <span class="n">userdel</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span> <span class="n">LOGIN</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="nl">Options</span><span class="p">:</span>
+</span><span class='line'>  <span class="o">-</span><span class="n">f</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ndash</span><span class="p">;</span><span class="n">force</span>                   <span class="n">force</span> <span class="n">removal</span> <span class="n">of</span> <span class="n">files</span><span class="p">,</span>
+</span><span class='line'>                                <span class="n">even</span> <span class="k">if</span> <span class="n">not</span> <span class="n">owned</span> <span class="n">by</span> <span class="n">user</span>
+</span><span class='line'>  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ndash</span><span class="p">;</span><span class="n">help</span>                    <span class="n">display</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span> <span class="n">and</span> <span class="n">exit</span>
+</span><span class='line'>  <span class="o">-</span><span class="n">r</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ndash</span><span class="p">;</span><span class="n">remove</span>                  <span class="n">remove</span> <span class="n">home</span> <span class="n">directory</span> <span class="n">and</span> <span class="n">mail</span> <span class="n">spool</span>
+</span><span class='line'>  <span class="o">-</span><span class="n">Z</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ndash</span><span class="p">;</span><span class="n">selinux</span><span class="o">-</span><span class="n">user</span>            <span class="n">remove</span> <span class="n">SELinux</span> <span class="n">user</span> <span class="n">from</span> <span class="n">SELinux</span> <span class="n">user</span> <span class="n">mapping</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<ul>
+<li>拾遗</li>
+</ul>
+
+
+<p>Linux下有三类用户，超级用户(root)具有操作系统的一切权限，UID值均为0。普通用户具有操作系统有限的权限，只能管理自己启动的进程，UID值500~6000。系统用户是为了方便系统管理，满足相应的系统进程对文件属主的的要求，系统用户不能登录，UID值1~499。</p>
+
+<p>这里新建普通用户的UID会依次增长，fsj为500，test0为501，test1为502
+<code>c
+$ id fsj
+uid=500(fsj) gid=500(fsj) groups=500(fsj)
+$ id test0
+uid=501(test0) gid=501(test0) groups=501(test0)
+</code></p>
+
+<h1>文件/目录权限管理</h1>
+
+<ul>
+<li>1 文件详情中有权限信息</li>
+</ul>
+
+
+<pre><code class="c">[fsj@vm-centos shit]$ ll
+total 0
+[fsj@vm-centos shit]$ touch shit.c
+[fsj@vm-centos shit]$ ll
+total 0
+-rw-rw-r--. 1 fsj fsj 0 Mar 27 13:10 shit.c
+</code></pre>
+
+<p>其中第一列<code>-rw-rw-r--</code>表示当前文件权限，其他列see also：[4].<br/>
+这一列的第一个字符表示文件类型。取值包括：
+<code>c
+d ：目录
+- ：文件
+l ：链接
+s ：socket
+p ：named pipe
+b ：block device
+c  ：character device
+</code></p>
+
+<p>剩下9位，3为一组。格式为：[属主权限][属组用户权限][其他用户权限]</p>
+
+<p>属主和属组用户为<code>rw-</code>，有读、写权限。<br/>
+其他用户为<code>r--</code>，有读权限。</p>
+
+<ul>
+<li>2 用chmod设置文件权限</li>
+</ul>
+
+
+<p>把前面shit.c权限改为只允许属主读写执行(rwx)，其他用户只能读&reg;.
+<code>c
+[fsj@vm-centos shit]$ chmod 744 shit.c
+[fsj@vm-centos shit]$ ll
+total 0
+-rwxr--r--. 1 fsj fsj 0 Mar 27 13:10 shit.c
+</code>
+744什么和rwx对应起来的呢？</p>
+
+<p>我们用二进制来表示是否允许某个权限，允许就置1，不允许就置0，比如777表示所有用户都有读、写、执行权限。
+7<code>7</code>7（8进制）=111<code>111</code>111（2进制），9位都置一，就是所有权限都开。<br/>
+这里7<code>4</code>4（8进制）=111<code>100</code>100（2进制），属主读写执行(rwx)，其他用户只能读&reg;.</p>
+
+<p>换算的时候rwx权重分别看作421那就简单了，比如<code>rw-</code>就是<code>110</code>，也是<code>6</code>.</p>
+
+<p>修改权限有什么用呢？当你搞一些配置文件的时候会想起来的~</p>
+
+<h1>ref</h1>
+
+<ul>
+<li>[1] <a href="http://linuxtools-rst.readthedocs.org/zh_CN/latest/index.html">linux工具快速教程</a></li>
+<li>[2] Linux入门——郭桂鑫</li>
+<li>[3] <a href="http://www.2cto.com/os/201408/328936.html">Linux中添加用户、删除用户时新手可能遇到的问题</a></li>
+<li>[4] <a href="http://blog.csdn.net/jenminzhang/article/details/9816853"> Linux &ldquo;ls -l"文件列表权限详解</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Linux服务器配置和管理：虚拟机安装CentOS6.7]]></title>
+    <link href="http://lawlietfans.coding.me/blog/2016/02/29/introduction-and-centos67-install/"/>
+    <updated>2016-02-29T20:00:00+08:00</updated>
+    <id>http://lawlietfans.coding.me/blog/2016/02/29/introduction-and-centos67-install</id>
+    <content type="html"><![CDATA[<blockquote><p>原文地址：<a href="http://lawlietfans.coding.me/blog/2016/02/29/introduction-and-centos67-install/">http://lawlietfans.coding.me/blog/2016/02/29/introduction-and-centos67-install/</a></p></blockquote>
+
+<p>相比于在PC端的流行的Windows，多数服务器使用的则是Linux系统。对于刚刚进入IT领域的“菜鸟”而言，学习和掌握Linux服务器配置与管理是非常有意义的。学windows，天天跟着时尚跑，今天DNA，明天COM，后天.NET; 而Unix/Linux，几十年前的思想今天看来依然光彩夺目。（<a href="http://www.zhihu.com/question/19771396">学习 Linux 有哪些好处？</a>)。</p>
+
+<p>本系列教程全部都是基于vmware 11.1+ centos 6.7 i386的，宿主机为Windows7 x64操作系统。<br/>
+本文内容包括：发展史；自由软件文化；Linux系统的优势；安装使用。</p>
+
+<!-- more -->
+
+
+<p>CentOS是Community ENTerprise Operating System的简称，是Linux的一个发行版本。发行版其实就是一些整合的安装套件，它是由一些有系统整合能力的工作小组、机构或商业化公司等主动搜集并整合了网络上的部分Linux程序，把系统内核、附带的工具程序以及应用软件包等打包在一起，组成的一个Linux操作系统的集合体。安装者可以一次安装一个包括各种程序在内的完整系统，极大地提高了系统的安装效率。</p>
+
+<p>其中RHEL(Red Hat Enterprise Linux)是很多企业采用的linux发行版本，需要向RedHat付费才可以使用，并能得到付过费用的服务和技术支持和版本升级。CentOS是RHEL的克隆版本，可以像REHL一样的构筑linux系统环境，但不需要向RedHat付任何的费用，同样也得不到任何有偿技术支持和升级服务。</p>
+
+<h1>Linux发展史；自由软件文化；Linux系统的优势</h1>
+
+<p>对new beginner来说，这部分没什么意义，网上内容很多，你懂的。</p>
+
+<h1>0 安装前准备</h1>
+
+<ul>
+<li>vmware虚拟机</li>
+<li><a href="http://mirrors.163.com/centos/6.7/isos/i386/">centos6.7 iso文件</a>
+
+<ul>
+<li>只需要下载CentOS-6.7-i386-bin-DVD1.iso就可以了。</li>
+<li>DVD1已经包含了完整的base distribution，不需要下载DVD2</li>
+</ul>
+</li>
+</ul>
+
+
+<h1>1 安装流程</h1>
+
+<p>参考[1]即可，流程如下：</p>
+
+<ul>
+<li>创建虚拟机vm-centos（我这里测试用机磁盘大小填的40GB）</li>
+<li>设置centos，添加系统镜像文件</li>
+<li>启动虚拟机，进入安装步骤</li>
+</ul>
+
+
+<p>其中在在分区这一步，直接选择Use All Space比较简单，centos会默认分区。</p>
+
+<p><img src="http://www.linuxdown.net/uploads/allimg/150823/02055WV8-25.jpg" alt="" /></p>
+
+<p>我这里选择的自定义虚拟分区，划分<code>/boot</code>分区为300M，剩余的为LVM，具体如下：</p>
+
+<pre><code class="c">/boot  300M
+/LVM  
+  / 20G
+  /var (余下全部)
+  /swap(自己内存大小)
+</code></pre>
+
+<blockquote><p>这里为什么要用LVM？ LVM：逻辑卷管理，把硬盘、分区作为物理卷PV，建立卷组VG，VG上建逻辑卷LV，再做成文件系统、裸设备，优点是可扩展性强<br/>
+标准分区：就是硬盘分区，可以做裸设备，或建文件系统，受硬盘大小限制，可扩展性差</p></blockquote>
+
+<ul>
+<li>安装完成</li>
+</ul>
+
+
+<h1>2 更新系统</h1>
+
+<ul>
+<li>打开terminal，输入<code>sudo yum update</code></li>
+</ul>
+
+
+<blockquote><p>在linux系统中，普通用户可以通过sudo 命令以super user 身份执行指令，只要输入该用户的密码即可。</p></blockquote>
+
+<p>如果登陆系统后执行sudo 命令提示<code>该用户不存在与群组sudoers中</code>，那么你需要<a href="http://www.centoscn.com/CentOS/2015/0417/5200.html">把用户添加到sudo列表中</a></p>
+
+<ul>
+<li>修改<code>/etc/sudoers</code>即可</li>
+</ul>
+
+
+<pre><code class="c">root  ALL=(ALL)   ALL    # 后面换行并将当前用户添加进去  
+xxx   ALL=(ALL)   ALL;    # xxx改成你的用户名
+</code></pre>
+
+<h1>3 设置开机自动联网</h1>
+
+<pre><code class="c">[fsj@vm-centos ~]$ sudo vi /etc/sysconfig/network-scripts/ifcfg-eth0 
+
+把ONBOOT="no"改为yes
+</code></pre>
+
+<blockquote><p>控制台上<code>[fsj@vm-centos ~]$</code>的通用格式为<code>[用户名@机器名称 当前路径]提示符</code>，其中提示符为$表示普通权限，后面以<code>$</code>开头的语句都是要在控制台输入的命令</p></blockquote>
+
+<h1>4 安装OpenSSH Server</h1>
+
+<p>方便宿主机的xshell连接刚装好的虚拟机<code>vm-centos</code></p>
+
+<ul>
+<li>$ yum search ssh</li>
+<li>$ yum install openssh-server</li>
+<li>检查该服务开机启动：chkconfig &ndash;list sshd</li>
+<li>手动启动sshd服务:<code>/etc/init.d/sshd start</code></li>
+</ul>
+
+
+<pre><code class="c">$ chkconfig --list sshd
+sshd            0:off 1:off 2:on  3:on  4:on  5:on  6:off
+</code></pre>
+
+<p>2~5都是on，就表明会自动启动</p>
+
+<h1>5 通过xshell连接<code>vm-centos</code></h1>
+
+<p>安装好openssh之后就能在宿主机连接<code>vm-centos</code>了。</p>
+
+<p>获取<code>vm-centos</code>地址</p>
+
+<p><img src="http://7xo0zf.com1.z0.glb.clouddn.com/16-3-18/64469253.jpg" alt="" />
+<img src="http://7xo0zf.com1.z0.glb.clouddn.com/16-3-18/84107400.jpg" alt="" /></p>
+
+<p>打开xshell，新建连接</p>
+
+<p><img src="http://7xo0zf.com1.z0.glb.clouddn.com/16-3-18/40913349.jpg" alt="" />
+<img src="http://7xo0zf.com1.z0.glb.clouddn.com/16-3-18/6379138.jpg" alt="" /></p>
+
+<p>连接成功</p>
+
+<p><img src="http://7xo0zf.com1.z0.glb.clouddn.com/16-3-18/93379079.jpg" alt="" /></p>
+
+<h1>ref</h1>
+
+<ul>
+<li>[1] <a href="http://www.centoscn.com/image-text/setup/2015/0823/6047.html">虚拟机下安装CentOS 6.7系统教程</a></li>
+<li>[2] <a href="http://www.linuxidc.com/Linux/2011-07/39098.htm">http://www.linuxidc.com/Linux/2011-07/39098.htm</a></li>
+<li>[3] <a href="http://www.zhihu.com/question/19738282">Linux 作为服务器操作系统的优势是什么？</a></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>
