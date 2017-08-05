@@ -23,6 +23,24 @@ categories: [x, xx]
 
 http://www.dejal.com/timeout/
 
+1.4 在Finder中查看隐藏文件、全路径
+
+查看隐藏文件：
+
+`$ defaults write com.apple.finder AppleShowAllFiles -bool true`
+
+取消查看：
+
+`$ defaults write com.apple.finder AppleShowAllFiles -bool false`
+
+查看全路径：
+
+`$ defaults write com.apple.finder _FXShowPosixPathInTitle -bool TRUE;killall Finder`
+
+取消查看：
+
+`$ defaults delete com.apple.finder _FXShowPosixPathInTitle;killall Finder`
+
 # 2 shell
 
 ## 2.1 ssh连接到GitHub提示Permission denied (publickey).
