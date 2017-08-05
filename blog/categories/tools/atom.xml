@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Tools | 畑鹿驚 - 博客]]></title>
+  <link href="http://lawlietfans.coding.me/blog/categories/tools/atom.xml" rel="self"/>
+  <link href="http://lawlietfans.coding.me/"/>
+  <updated>2017-01-19T00:11:00+08:00</updated>
+  <id>http://lawlietfans.coding.me/</id>
+  <author>
+    <name><![CDATA[lawlietfans]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Sublime Text3下快速搭建开发环境]]></title>
+    <link href="http://lawlietfans.coding.me/blog/2016/12/27/how-to-setup-ST3-dev-env/"/>
+    <updated>2016-12-27T20:00:00+08:00</updated>
+    <id>http://lawlietfans.coding.me/blog/2016/12/27/how-to-setup-ST3-dev-env</id>
+    <content type="html"><![CDATA[<p>原文链接：<a href="http://www.cnblogs.com/lawlietfans/p/6224824.html">http://www.cnblogs.com/lawlietfans/p/6224824.html</a></p>
+
+<p>安装好<a href="http://www.sublimetext.com/3">Sublime Text3</a>之后，简单几步就可以搭建一个好用的开发环境。</p>
+
+<p>sublime的设置包括自定义设置以及插件系统。</p>
+
+<!-- more -->
+
+
+<p>打开菜单<code>Preferences -&gt; Settings</code>，编辑自定义设置（json格式）</p>
+
+<pre><code class="json">{
+    "caret_style": "phase",
+    "theme": "Spacegray.sublime-theme",
+  "color_scheme": "Packages/Theme - Spacegray/base16-eighties.dark.tmTheme",
+    "ensure_newline_at_eof_on_save": true,
+    "font_face": "YaHei Consolas Hybrid",
+    "font_size": 16,
+    "format_on_save": true,
+    "highlight_line": true,
+    "highlight_modified_tabs": true,
+    "rulers":
+    [
+        80,
+        100
+    ],
+    "tab_size": 2,
+    "translate_tabs_to_spaces": true,
+    "update_check": false
+}
+</code></pre>
+
+<p>我们要通过Package Control安装需要的插件，所以首先安装Package Control</p>
+
+<p>三种方法安装Package control：</p>
+
+<ol>
+<li><code>ctrl+shift+p</code>打开命令板，输入<code>pc</code>可以看到下拉列表出现<code>install package control</code>（模糊识别关键字）</li>
+<li>使用Ctrl+`快捷键或者通过View->Show Console菜单打开命令行，粘贴代码</li>
+<li>手动下载<code>Package Control.sublime-package</code>并复制到Installed Packages/目录</li>
+</ol>
+
+
+<p>方法2、3详见<a href="http://www.cnblogs.com/luoshupeng/archive/2013/09/09/3310777.html">Sublime Text 3 安装Package Control</a></p>
+
+<h1>1 python开发者</h1>
+
+<p>python开发者可能需要如下插件：</p>
+
+<ul>
+<li>autosave：自动保存文件</li>
+<li>AutoPEP8：按照PEP规范调整你的python代码</li>
+<li>IMESupport：中文输入框跟随光标[1]</li>
+<li>SublimeREPL：sublime read–eval–print loop (REPL)插件
+
+<ul>
+<li>通过菜单Tools->SublimeREPL->Python可以进入命令行环境</li>
+<li><a href="https://www.zhihu.com/question/22904994">键位绑定</a></li>
+</ul>
+</li>
+</ul>
+
+
+<p>安装插件gif图演示详见[1]</p>
+
+<h1>2 markdown编写</h1>
+
+<p>只需要满足高亮就可以了。许多博文，包括[2]提到<a href="https://packagecontrol.io/packages/MarkdownEditing">markdown editing</a>插件，可我觉得实在是太难看了，和sublime黑色主题不搭。</p>
+
+<p>这里强烈推荐spacegray主题。</p>
+
+<ul>
+<li><a href="https://packagecontrol.io/packages/Theme%20-%20Spacegray">theme spacegray</a>
+
+<ul>
+<li>自动高亮Markdown关键字</li>
+<li>和sublime原来风格契合，可以同时使得sidebar主题也对应变化。</li>
+</ul>
+</li>
+</ul>
+
+
+<h1>References</h1>
+
+<ol>
+<li><a href="http://www.cnblogs.com/figure9/p/sublime-text-complete-guide.html">http://www.cnblogs.com/figure9/p/sublime-text-complete-guide.html</a></li>
+<li><a href="http://www.cnblogs.com/jadeboy/p/5049340.html">http://www.cnblogs.com/jadeboy/p/5049340.html</a></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+</feed>

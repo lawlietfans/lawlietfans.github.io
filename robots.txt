@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: http://lawlietfans.coding.me/sitemap.xml
